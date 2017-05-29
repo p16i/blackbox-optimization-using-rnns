@@ -5,6 +5,7 @@ functions = {
     'parabola' : lambda x : math.pow(x,2)
 }
 
+
 def loadConfig():
     with open("config.yaml", 'r') as stream:
         try:
