@@ -114,5 +114,5 @@ def train_rnn_n2n(dim, n_steps = 10, learning_rate=0.001, epochs=1000, n_hidden 
 
 if __name__ == "__main__":
     print("run as main")
-    train_rnn_n2n(1, epochs=10)
+    train_rnn_n2n(2, epochs=1000)
 
