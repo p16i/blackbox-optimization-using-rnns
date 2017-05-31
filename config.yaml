@@ -11,3 +11,4 @@ experiments:
         # hyperparameter
             n_hidden: [30,40,50,100]
             loss_function: ['MIN','SUM','WSUM','EI']
+            batch_size: [1000]
