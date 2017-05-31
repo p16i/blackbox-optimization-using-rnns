@@ -6,7 +6,7 @@ import fire
 import os
 
 class ExperimentManager:
-    def run( self, dimension, log_dir ):
+    def run( self, dimension, log_dir, epochs):
         # todo: check if log dir doesn't exists otherwise fail
         config = utils.loadConfig()
         log_location = config['BASE_LOG_DIR']  + '/' + log_dir
@@ -31,7 +31,7 @@ class ExperimentManager:
             filepath = log_location + '/' + filename
             f = open(filepath, 'w')
             print('%3d/%d - [log-id: %s] %s ' % ( i+1, total_combinations, filename, params ))
-            rnn_n2n.train_rnn_n2n(dimension, epochs=1, logger = f, **params)
+            rnn_n2n.train_rnn_n2n(dimension, epochs = epochs, logger = f, **params)
         end = time.time()
 
         print("Finished %d combinations using %.4f mins"%( total_combinations, (end-start)/60.0 ))
