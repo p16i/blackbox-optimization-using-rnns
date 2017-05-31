@@ -1,6 +1,7 @@
 import yaml
 import math
 import numpy as np
+import time
 
 functions = {
     'parabola' : lambda x : math.pow(x,2)
