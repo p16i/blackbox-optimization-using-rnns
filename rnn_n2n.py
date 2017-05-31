@@ -131,6 +131,7 @@ def train_rnn_n2n(dim, n_steps = 10, learning_rate=0.001, epochs=1000, n_hidden 
         if ep < 10 or ep % (epochs // 10) == 0 or ep == epochs-1:
             msg = "Ep: %4d | TrainLoss : %.3f | TrainMin: %.3f | TestLoss: %.3f | TestMin: %.3f" % (ep, train_loss, train_fmin, test_loss, test_fmin)
             debug(msg)
+        debug('Last output: %s' % msg)
     sess.close()
 
 if __name__ == "__main__":
