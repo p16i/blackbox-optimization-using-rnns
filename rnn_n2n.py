@@ -16,6 +16,8 @@ def normalize(minv, maxv, y):
         return 2*(y-minv)/(maxv-minv)-1.0
 
 def train_rnn_n2n(dim, n_steps = 10, learning_rate=0.001, epochs=1000, n_hidden = 50, batch_size = 160, loss_function='WSUM', logger=sys.stdout):
+    tf.set_random_seed(1)
+
     # declare utils
     debug = lambda x : (print(x, file=logger), logger.flush())
 
@@ -43,6 +45,7 @@ def train_rnn_n2n(dim, n_steps = 10, learning_rate=0.001, epochs=1000, n_hidden 
     biases = {
         'out': tf.Variable(tf.random_normal([dim]))
     }
+
 
     size = tf.placeholder(tf.int32,[])
 
