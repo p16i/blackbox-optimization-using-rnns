@@ -30,8 +30,14 @@ class ExperimentManager:
             filename = str(int(time.time()))
             filepath = log_location + '/' + filename
             f = open(filepath, 'w')
+
             print('%3d/%d - [log-id: %s] %s ' % ( i+1, total_combinations, filename, params ))
+
+            start_inner = time.time()
             rnn_n2n.train_rnn_n2n(dimension, epochs = epochs, logger = f, **params)
+            end_inner = time.time()
+
+            print('>> took %.4f mins' % ((end_inner - start_inner)/60))
         end = time.time()
 
         print("Finished %d combinations using %.4f mins"%( total_combinations, (end-start)/60.0 ))
