@@ -1,2 +1,14 @@
 TIME_HORIZON: 100
 DATA_DIR: ./Data
+BASE_LOG_DIR: ./log
+
+experiments:
+    2D:
+        no_training: 20000
+        no_testing : 2000
+
+        hyperparameters:
+        # hyperparameter
+            n_hidden: [30,40,50,100]
+            loss_function: ['MIN','SUM','WSUM','EI']
+            batch_size: [1000]
