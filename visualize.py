@@ -75,7 +75,8 @@ def plot_result(fun, dim, nplot, samples):
 			plt.ylim([-1,1])
 		plt.show()
 
-def visualize_learning(train_loss_list, test_loss_list, train_fmin_list, test_fmin_list):		
+def visualize_learning(train_logs):		
+	train_loss_list, test_loss_list, train_fmin_list, test_fmin_list = train_logs
 	plt.figure(figsize=(20,8))
 	plt.subplot(2,2,1)
 	plt.plot(train_loss_list)
