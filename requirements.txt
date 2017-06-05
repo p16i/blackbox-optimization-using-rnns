@@ -4,9 +4,10 @@ bleach==2.0.0
 cycler==0.10.0
 decorator==4.0.11
 entrypoints==0.2.2
+fire==0.1.1
 html5lib==0.999999999
 ipykernel==4.6.1
-ipython==6.0.0
+ipython==5.4.0
 ipython-genutils==0.2.0
 ipywidgets==6.0.0
 jedi==0.10.2
@@ -24,6 +25,7 @@ nbformat==4.3.0
 notebook==5.0.0
 numpy==1.12.1
 packaging==16.8
+pandas==0.20.1
 pandocfilters==1.4.1
 pexpect==4.2.1
 pickleshare==0.7.4
@@ -38,9 +40,11 @@ PyWaPa-3k==0.1.1
 PyYAML==3.12
 pyzmq==16.0.2
 qtconsole==4.3.0
+scikit-learn==0.18.1
 scipy==0.19.0
 simplegeneric==0.8.1
 six==1.10.0
+sklearn==0.0
 tensorflow==1.1.0
 terminado==0.6
 testpath==0.3
