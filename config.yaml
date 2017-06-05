@@ -9,6 +9,8 @@ experiments:
 
         hyperparameters:
         # hyperparameter
+            learning_rate_init: [0.002]
+            learning_rate_final: [0.005]
             n_hidden: [30,40,50,100]
             loss_function: ['MIN','SUM','WSUM','EI']
             batch_size: [1000]

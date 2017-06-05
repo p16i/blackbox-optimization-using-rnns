@@ -15,8 +15,10 @@ def GPTF(X,A,x, l = 0.3):
 def normalize(minv, maxv, y):
         return 2*(y-minv)/(maxv-minv)-1.0
 
-def train_rnn_n2n(dim, n_steps = 10, learning_rate=0.001, epochs=1000, n_hidden = 50, batch_size = 160, loss_function='WSUM', logger=sys.stdout):
+def train_rnn_n2n(dim, n_steps = 10, learning_rate_init=0.001, learning_rate_final=0.0001, epochs=1000, n_hidden = 50, batch_size = 160, loss_function='WSUM', logger=sys.stdout):
     tf.set_random_seed(1)
+
+    learning_rate_decay_rate = (learning_rate_final/learning_rate_init) ** (1.0 / (epochs-1) )
 
     # declare utils
     debug = lambda x : (print(x, file=logger), logger.flush())
@@ -85,7 +87,8 @@ def train_rnn_n2n(dim, n_steps = 10, learning_rate=0.001, epochs=1000, n_hidden 
     f_min = tf.reduce_mean(tf.reduce_min(samples_y, axis = 0))
     loss = loss_dict[loss_function](samples_y)
 
-    train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss)
+    learning_rate_tf = tf.placeholder(tf.float32)
+    train_step = tf.train.AdamOptimizer(learning_rate_tf).minimize(loss)
 
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
@@ -106,17 +109,22 @@ def train_rnn_n2n(dim, n_steps = 10, learning_rate=0.001, epochs=1000, n_hidden 
     debug("%-30s: %d" % ("Number of hidden Units", n_hidden) )
     debug("%-30s: %d" % ("Sequence length", n_steps) )
     debug("%-30s: %d" % ("Epochs",epochs) )
-    debug("%-30s: %.5f" % ("Learning rate", learning_rate) )
+    debug("%-30s: %.5f" % ("Learning rate init", learning_rate_init) )
+    debug("%-30s: %.5f" % ("Learning rate decay", learning_rate_decay_rate) )
+    debug("%-30s: %.5f" % ("Learning rate final", learning_rate_final) )
     debug("------------------------------------------------------------------------------------")
 
+    learning_rate = learning_rate_init
     for ep in range(epochs):
+        learning_rate = learning_rate * learning_rate_decay_rate
+
         for batch in range(len(X_train)//batch_size):
             X_batch = X_train[batch*batch_size:(batch+1)*batch_size]
             A_batch = A_train[batch*batch_size:(batch+1)*batch_size]
             min_batch = min_train[batch*batch_size:(batch+1)*batch_size]
             max_batch = max_train[batch*batch_size:(batch+1)*batch_size]
 
-            sess.run([train_step], feed_dict={Xt: X_batch, At: A_batch, mint: min_batch, maxt: max_batch, size: X_batch.shape[0]})
+            sess.run([train_step], feed_dict={Xt: X_batch, At: A_batch, mint: min_batch, maxt: max_batch, size: X_batch.shape[0], learning_rate_tf: learning_rate})
 
         train_loss, train_fmin = sess.run([loss, f_min], feed_dict=\
                                           {Xt: X_train, At: A_train, mint: min_train, maxt: max_train, size: len(X_train)})
@@ -131,6 +139,7 @@ def train_rnn_n2n(dim, n_steps = 10, learning_rate=0.001, epochs=1000, n_hidden 
         if ep < 10 or ep % (epochs // 10) == 0 or ep == epochs-1:
             msg = "Ep: %4d | TrainLoss : %.3f | TrainMin: %.3f | TestLoss: %.3f | TestMin: %.3f" % (ep, train_loss, train_fmin, test_loss, test_fmin)
             debug(msg)
+
     debug('Last output: %s' % msg)
     sess.close()
 
@@ -138,6 +147,6 @@ if __name__ == "__main__":
     print("run as main")
     dim = 2
     f = open('something-%d.txt' %dim, 'w')
-    train_rnn_n2n(dim, epochs=1, logger=f)
+    train_rnn_n2n(dim, epochs=2, logger=f)
 
 
