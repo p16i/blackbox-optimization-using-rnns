@@ -39,7 +39,7 @@ def plot_training_data(fun, dim, nplot, heat=True):
 				plt.ylim([-1,1])
 			plt.show()
 			
-def plot_result(fun, dim, nplot, samples):
+def plot_result(fun, dim, nplot, samples, samples_y):
 	n2 = np.ceil(np.sqrt(nplot))
 	n1 = np.ceil(nplot/n2)
 	n_steps = samples.shape[1]
@@ -47,15 +47,15 @@ def plot_result(fun, dim, nplot, samples):
 	if dim == 1:  
 		xx = np.linspace(-1,1,200).reshape(1,-1, dim)
 		yy = fun(xx)
-		samples_y = fun(samples)
+		samples_yy = fun(samples)
 		
 		plt.figure(figsize=(20,15))		
 		for i in range(nplot):        
 			plt.subplot(n1,n2,i+1)
 			plt.plot(xx.flatten(),yy[i],linewidth=3)
-			plt.scatter(samples[i],samples_y[i],color="k")
+			plt.scatter(samples[i],samples_yy[i],color="k")
 			for j in range(n_steps):
-				plt.text(samples[i,j], samples_y[i,j], str(j), color="red", fontsize=12)			
+				plt.text(samples[i,j], samples_yy[i,j], str(j), color="red", fontsize=12)			
 		plt.show()	
 	if dim == 2:
 		xx1 = np.linspace(-1,1,100)
@@ -74,6 +74,12 @@ def plot_result(fun, dim, nplot, samples):
 			plt.xlim([-1,1])
 			plt.ylim([-1,1])
 		plt.show()
+		
+	plt.figure(figsize=(20,6))
+	for i in range(nplot):
+		plt.subplot(n1,n2,i+1)
+		plt.plot(samples_y[i])
+	plt.show()
 
 def visualize_learning(train_logs):		
 	train_loss_list, test_loss_list, train_fmin_list, test_fmin_list = train_logs
@@ -91,3 +97,4 @@ def visualize_learning(train_logs):
 	plt.plot(test_fmin_list)
 	plt.title("Validation Minimum")
 	plt.show()
+	
