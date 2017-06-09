@@ -30,7 +30,9 @@ def train_rnn_n2n(dim, n_steps = 10, learning_rate_init=0.001, learning_rate_fin
         "WSUM" : lambda x : \
             tf.reduce_mean(tf.reduce_sum(tf.multiply(x, np.linspace(1/(n_steps+1),1, n_steps+1)), axis = 0)),
         "EI" : lambda x : tf.reduce_mean(tf.reduce_sum(x, axis = 0))
-            - tf.reduce_mean(tf.reduce_sum([tf.reduce_min(x[:i+1],axis = 0) for i in range(n_steps)], axis = 0))
+            - tf.reduce_mean(tf.reduce_sum([tf.reduce_min(x[:i+1],axis = 0) for i in range(n_steps)], axis = 0)),
+        'WSUM_EXPO': lambda x: \
+             tf.reduce_mean(tf.reduce_sum(tf.multiply(x, np.power(0.5,np.arange(1,n_steps+1)[::-1])), axis = 0))
     }
 
     # load data
