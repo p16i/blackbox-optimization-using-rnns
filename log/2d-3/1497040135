@@ -1,0 +1,35 @@
+------------------------------------------------------------------------------------
+Function Dimension            : 2
+RNN Scope                     : rnn-cell-1497040135
+Number of Training Samples    : 20000
+Number of Test Samples        : 2000
+Loss                          : WSUM_EXPO
+Batch size                    : 256
+Number of hidden Units        : 50
+Sequence length               : 10
+Epochs                        : 1000
+Learning rate init            : 0.00200
+Learning rate decay           : 1.00092
+Learning rate final           : 0.00500
+------------------------------------------------------------------------------------
+Ep:    0 | TrainLoss : -0.107 | TrainMin: -0.467 | TestLoss: -0.091 | TestMin: -0.445
+Ep:    1 | TrainLoss : -0.097 | TrainMin: -0.468 | TestLoss: -0.080 | TestMin: -0.443
+Ep:    2 | TrainLoss : -0.104 | TrainMin: -0.419 | TestLoss: -0.098 | TestMin: -0.414
+Ep:    3 | TrainLoss : -0.069 | TrainMin: -0.354 | TestLoss: -0.059 | TestMin: -0.337
+Ep:    4 | TrainLoss : -0.101 | TrainMin: -0.468 | TestLoss: -0.088 | TestMin: -0.452
+Ep:    5 | TrainLoss : -0.064 | TrainMin: -0.395 | TestLoss: -0.053 | TestMin: -0.380
+Ep:    6 | TrainLoss : -0.052 | TrainMin: -0.321 | TestLoss: -0.049 | TestMin: -0.313
+Ep:    7 | TrainLoss : -0.064 | TrainMin: -0.364 | TestLoss: -0.062 | TestMin: -0.367
+Ep:    8 | TrainLoss : -0.032 | TrainMin: -0.316 | TestLoss: -0.027 | TestMin: -0.311
+Ep:    9 | TrainLoss : -0.042 | TrainMin: -0.281 | TestLoss: -0.037 | TestMin: -0.275
+Ep:  100 | TrainLoss : -0.344 | TrainMin: -0.686 | TestLoss: -0.347 | TestMin: -0.692
+Ep:  200 | TrainLoss : -0.417 | TrainMin: -0.767 | TestLoss: -0.423 | TestMin: -0.779
+Ep:  300 | TrainLoss : -0.431 | TrainMin: -0.798 | TestLoss: -0.411 | TestMin: -0.788
+Ep:  400 | TrainLoss : -0.446 | TrainMin: -0.806 | TestLoss: -0.434 | TestMin: -0.796
+Ep:  500 | TrainLoss : -0.483 | TrainMin: -0.822 | TestLoss: -0.487 | TestMin: -0.827
+Ep:  600 | TrainLoss : -0.466 | TrainMin: -0.778 | TestLoss: -0.463 | TestMin: -0.780
+Ep:  700 | TrainLoss : -0.445 | TrainMin: -0.832 | TestLoss: -0.452 | TestMin: -0.851
+Ep:  800 | TrainLoss : -0.418 | TrainMin: -0.753 | TestLoss: -0.408 | TestMin: -0.750
+Ep:  900 | TrainLoss : -0.343 | TrainMin: -0.758 | TestLoss: -0.336 | TestMin: -0.753
+Ep:  999 | TrainLoss : -0.367 | TrainMin: -0.742 | TestLoss: -0.359 | TestMin: -0.742
+Last output: Ep:  999 | TrainLoss : -0.367 | TrainMin: -0.742 | TestLoss: -0.359 | TestMin: -0.742
