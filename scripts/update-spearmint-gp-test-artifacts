@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cp config.yaml spearmint-config/gp-test/config.yaml
+cp -r Data spearmint-config/gp-test/

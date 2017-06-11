@@ -15,7 +15,7 @@ def GPTF(X,A,x, l = 0.3):
 def normalize(minv, maxv, y):
         return 2*(y-minv)/(maxv-minv)-1.0
 
-def train_rnn_n2n(dim, n_steps = 10, learning_rate_init=0.001, learning_rate_final=0.0001, epochs=1000, n_hidden = 50, batch_size = 160, loss_function='WSUM', logger=sys.stdout):
+def train_rnn_n2n(dim, n_steps = 20, learning_rate_init=0.001, learning_rate_final=0.0001, epochs=1000, n_hidden = 50, batch_size = 160, loss_function='WSUM', logger=sys.stdout, close_session=True):
     tf.set_random_seed(1)
 
     learning_rate_decay_rate = (learning_rate_final/learning_rate_init) ** (1.0 / (epochs-1) )
@@ -51,12 +51,12 @@ def train_rnn_n2n(dim, n_steps = 10, learning_rate_init=0.001, learning_rate_fin
     }
 
 
-    size = tf.placeholder(tf.int32,[])
+    size = tf.placeholder(tf.int32,[], name="size")
 
-    Xt = tf.placeholder(tf.float32, [None, n_gp_samples, dim])
-    At = tf.placeholder(tf.float32, [None, n_gp_samples, 1])
-    mint = tf.placeholder(tf.float32, [None, 1])
-    maxt = tf.placeholder(tf.float32, [None, 1])
+    Xt = tf.placeholder(tf.float32, [None, n_gp_samples, dim], name="Xt")
+    At = tf.placeholder(tf.float32, [None, n_gp_samples, 1], name="At")
+    mint = tf.placeholder(tf.float32, [None, 1], name="mmint")
+    maxt = tf.placeholder(tf.float32, [None, 1], name="mmaxt")
 
     x_0 = -0.0*tf.ones([size, dim])
     h_0 = tf.ones([size, n_hidden])
@@ -143,7 +143,11 @@ def train_rnn_n2n(dim, n_steps = 10, learning_rate_init=0.001, learning_rate_fin
             debug(msg)
 
     debug('Last output: %s' % msg)
-    sess.close()
+    if close_session:
+        sess.close()
+    else:
+        print('Leave session open')
+        return sess, (samples_y, Xt, At, mint, maxt, size)
 
 if __name__ == "__main__":
     print("run as main")

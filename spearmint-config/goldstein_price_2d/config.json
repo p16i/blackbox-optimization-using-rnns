@@ -1,0 +1,21 @@
+{
+    "language"        : "PYTHON",
+    "main-file"       : "goldstein_price_2d.py",
+    "experiment-name" : "goldstein_price_2d",
+    "likelihood"      : "NOISELESS",
+    "variables" : {
+        "x1" : {
+            "type" : "FLOAT",
+            "size" : 1,
+            "min"  : -2,
+            "max"  : 2
+        },
+        "x2" : {
+            "type" : "FLOAT",
+            "size" : 1,
+            "min"  : -2,
+            "max"  : 2
+        }
+    }
+}
+
