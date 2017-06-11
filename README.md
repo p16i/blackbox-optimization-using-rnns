@@ -32,7 +32,7 @@ git clone git@github.com:heytitle/neural-network-project.git
 Each experiment is corresponding to training `RNN` on training data determined with `--dimension` with combinations of hyperparameter specifid in `config.yaml`. The `experiment-manager.py` will write training logs to a directory(`--log-dir`) under `LOG_BASE`, for example `./log/2d`. The example below shows how to run the command.
 
 ```
-python experiment-manager.py run --dimension 2 --log_dir 2d --epochs 2
+TF_CPP_MIN_LOG_LEVEL=3 python experiment-manager.py run --dimension 2 --log_dir 2d --epochs 2
 ```
 
 **NOTE : Before running any experiment** 
