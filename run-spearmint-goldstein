@@ -1,0 +1,15 @@
+#!/bin/bash
+
+EXPERIMENT_DIR=spearmint-config/goldstein_price_2d
+STEP=20
+source python2-env/bin/activate
+
+for i in $(seq 1 $1)
+do
+    echo "---------- Run $i -----------"
+    mongo spearmint --eval 'db.goldstein_price_2d.hypers.drop(); db.goldstein_price_2d.jobs.drop(); db.dropDatabase()' && \
+        rm -rf $EXPERIMENT_DIR/output/* && \
+        python bayesian-optimization/Spearmint/spearmint/main.py spearmint-config/goldstein_price_2d/ --steps 20 && \
+        cat $EXPERIMENT_DIR/output/* | grep 'job #' > $EXPERIMENT_DIR/runs/`date +%s`
+done
+
