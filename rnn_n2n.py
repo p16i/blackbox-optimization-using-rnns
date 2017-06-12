@@ -179,7 +179,8 @@ def train_rnn_n2n(dim, n_steps = 20, learning_rate_init=0.001, learning_rate_fin
             'gp_length': l,
             'loss_function': loss_function,
             'learning_rate_init': learning_rate_init,
-            'learning_rate_final': learning_rate_final
+            'learning_rate_final': learning_rate_final,
+            'epochs': epochs
         }
         with open( '%s/network-params.json' % dir_path, 'w') as f:
             json.dump(network_params, f)
