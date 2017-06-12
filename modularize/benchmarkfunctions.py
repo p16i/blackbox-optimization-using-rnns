@@ -18,6 +18,7 @@ def branin(x):
     y = 2*(y-minv)/(maxv-minv)-1
     
     return y
+
 	
 def branin_tf(x):
     a = 1
