@@ -52,7 +52,7 @@ def build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l):
 
     samples_x, samples_y = apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, tf.shape(Xt)[0])
 
-    return Xt, At, mint, maxt, samples_x, samples_y
+    return Xt, At, mint, maxt, samples_x, samples_y, cell, weights
 
 def get_loss(samples_y, loss_type):
     loss_dict = {"MIN" : lambda x : tf.reduce_mean(tf.reduce_min(x, axis = 0)), 
@@ -81,8 +81,8 @@ def get_train_step(loss, gradient_clipping):
 
     return train_step, rate
 
-def train_model(sess, placeholders, epochs, batch_size, data_train, data_test, rate_init, rate_decay, gradient_clipping, \
-                loss_type, samples_y, log = True): 
+def train_model(sess, placeholders, samples_y, epochs, batch_size, data_train, data_test, rate_init, rate_decay, gradient_clipping, \
+                loss_type, log = True): 
     
     X_train, A_train, min_train, max_train = data_train
     X_test, A_test, min_test, max_test = data_test
