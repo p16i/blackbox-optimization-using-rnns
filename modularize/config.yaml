@@ -1,0 +1,84 @@
+TIME_HORIZON: 100
+DATA_DIR: ./Data
+BASE_LOG_DIR: ./log
+
+experiments:
+    2D:
+        no_training: 20000
+        no_testing : 2000
+
+        hyperparameters:
+            learning_rate_init: [0.005]
+            learning_rate_final: [0.0001]
+            n_hidden: [30,40,50,100]
+            loss_function: ['MIN','SUM','WSUM','EI', 'WSUM_EXPO']
+            batch_size: [256]
+            n_steps: 20
+            
+            
+    # 
+    1D:
+        np_training: 2000
+        no_testing: 2000
+
+        
+        hyperparameters:
+            n_hidden: [10,30,60,100]
+            loss_function: ['MIN','SUM','WSUM','EI', 'MINSUM', 'WSUM_EXPO']
+            batch_size: [128]
+            n_steps: [20]
+            epochs: [600]
+            gradient_clipping: [1.0]
+            
+    2D: 
+        np_training: 2000
+        no_testing: 2000
+
+        
+        hyperparameters:
+            n_hidden: [10,30,60,100]
+            loss_function: ['MIN','SUM','WSUM','EI', 'MINSUM', 'WSUM_EXPO']
+            batch_size: [128]
+            n_steps: [20]
+            epochs: [600]
+            gradient_clipping: [1.0]
+        
+    3D:
+        np_training: 4000
+        no_testing: 2000
+
+        
+        hyperparameters:
+            n_hidden: [10,30,60,100]
+            loss_function: ['MIN','SUM','WSUM','EI', 'MINSUM', 'WSUM_EXPO']
+            batch_size: [128]
+            n_steps: [20]
+            epochs: [600]
+            gradient_clipping: [1.0]
+    
+    4D:
+        np_training: 6000
+        no_testing: 2000
+
+        
+        hyperparameters:
+            n_hidden: [10,30,60,100]
+            loss_function: ['MIN','SUM','WSUM','EI', 'MINSUM', 'WSUM_EXPO']
+            batch_size: [128]
+            n_steps: [20]
+            epochs: [600]
+            gradient_clipping: [1.0]
+    
+    6D:
+        np_training: 10000
+        no_testing: 2000
+
+        
+        hyperparameters:
+            n_hidden: [10,30,60,100]
+            loss_function: ['MIN','SUM','WSUM','EI', 'MINSUM', 'WSUM_EXPO']
+            batch_size: [128]
+            n_steps: [20]
+            epochs: [600]
+            gradient_clipping: [1.0]
+    

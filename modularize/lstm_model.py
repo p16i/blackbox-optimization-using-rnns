@@ -45,6 +45,7 @@ def build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l):
     At = tf.placeholder(tf.float32, [None, n_bumps, 1])
     mint = tf.placeholder(tf.float32, [None, 1])
     maxt = tf.placeholder(tf.float32, [None, 1])
+    placeholders = {"Xt": Xt, "At": At, "mint": mint, "maxt": maxt}
 
     f = lambda x: gp.normalize(mint, maxt, gp.GPTF(Xt, At, x, l)) 
     
@@ -52,7 +53,7 @@ def build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l):
 
     samples_x, samples_y = apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, tf.shape(Xt)[0])
 
-    return Xt, At, mint, maxt, samples_x, samples_y, cell, weights
+    return placeholders, samples_x, samples_y, cell, weights
 
 def get_loss(samples_y, loss_type):
     loss_dict = {"MIN" : lambda x : tf.reduce_mean(tf.reduce_min(x, axis = 0)), 
@@ -140,3 +141,31 @@ def train_model(sess, placeholders, samples_y, epochs, batch_size, data_train, d
     if log:
         return (train_loss_list, test_loss_list, train_fmin_list, test_fmin_list)
     return None
+
+def get_samples(sess, placeholders, samples_x, samples_y, data):
+    
+    X, A, minv, maxv = data
+    n_train = X.shape[0]
+    
+    n = X.shape[0]  
+    dim = X.shape[-1]
+    
+    Xt = placeholders["Xt"]
+    At = placeholders["At"]
+    mint = placeholders["mint"]
+    maxt = placeholders["maxt"]
+    
+    # Extract Samples
+    samples_v_x, samples_v_y = sess.run([samples_x, samples_y], feed_dict={Xt: X, At: A, mint: minv, maxt: maxv})
+    samples_v_x = np.array(samples_v_x).reshape(-1,n, dim).transpose((1,0,2))
+    samples_v_y = np.array(samples_v_y).reshape(-1,n).T
+
+    return samples_v_x, samples_v_y
+
+def get_benchmark_samples(sess, f, cell, weights, dim, n_hidden, steps):
+    samples_benchmark_x, samples_benchmark_y = \
+        sess.run(apply_lstm_model(f, cell, weights, steps, dim, n_hidden, 1))
+    samples_benchmark_x = np.array(samples_benchmark_x).reshape(-1,1, dim).transpose((1,0,2))
+    samples_benchmark_y = np.array(samples_benchmark_y).reshape(-1,1).T
+    
+    return samples_benchmark_x, samples_benchmark_y

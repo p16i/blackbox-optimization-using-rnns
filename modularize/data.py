@@ -1,5 +1,6 @@
 import numpy as np
 import gpfunctions as gp
+#import utils
 
 def gen_data(n_train, n_test, dim, n_bumps, l, n_mc_samples = 100):
     X = np.random.uniform(low = -1.0, high = 1.0, size = (n_train+n_test, n_bumps, dim))
@@ -16,3 +17,22 @@ def gen_data(n_train, n_test, dim, n_bumps, l, n_mc_samples = 100):
 
     return (X[:n_train], A[:n_train], min_vals[:n_train], max_vals[:n_train],\
             X[-n_test:], A[-n_test:], min_vals[-n_test:], max_vals[-n_test:])
+
+
+def save_data(n_train, n_test, dim, n_bumps, l, n_mc_samples = 100):
+    """X_train, A_train, min_train, max_train, X_test, A_test, min_test, max_test = \
+                                    gen_data(n_train, n_test, dim, n_bumps, l, n_mc_samples)
+    data = {"training": [X_train, A_train, min_train, max_train], "testing": [X_test, A_test, min_test, max_test]}
+    for s in ["training", "testing"]:
+        directory = utils.getDataPath(dim, s)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        np.save( directory + "/X", data[s][0])
+        np.save( directory + "/A", data[s][1])
+        np.save( directory + "/minv", data[s][2])
+        np.save( directory + "/maxv", data[s][3])"""
+    return 
+
+def load_data():
+    return
