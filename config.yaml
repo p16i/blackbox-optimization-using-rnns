@@ -20,6 +20,7 @@ experiments:
     2D:
         no_training: 2000
         no_testing : 2000
+        best_model: rnn-cell-2d-1497306764
 
         hyperparameters:
             learning_rate_init: [0.005]
