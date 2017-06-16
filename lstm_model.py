@@ -70,9 +70,8 @@ def get_loss(samples_y, loss_type):
         "SUM" : lambda x : tf.reduce_mean(tf.reduce_sum(x, axis = 0)),
         "WSUM" : lambda x : \
             tf.reduce_mean(tf.reduce_sum(tf.multiply(x, np.linspace(1/(n_steps+1),1, n_steps+1)), axis = 0)),
-        "EI" : lambda x : tf.reduce_mean(tf.reduce_sum(x, axis = 0)) -\
-            tf.reduce_mean(tf.reduce_sum([tf.reduce_min(x[:i+1],\
-                axis = 0) for i in range(n_steps)], axis = 0)),
+        "OI": lambda x: \
+            tf.reduce_mean( tf.reduce_sum( [tf.reduce_min( x[i] - tf.reduce_min(x[:i]), 0  ) for i in range(1, n_steps) ], axis = 0  ), axis=0 ),
         "SUMMIN" : lambda x : tf.reduce_mean(tf.reduce_min(x, axis = 0)) +\
             tf.reduce_mean(tf.reduce_sum(x, axis = 0)) ,\
         'WSUM_EXPO': lambda x: \
@@ -228,6 +227,6 @@ if __name__ == "__main__":
     print("run as main")
     dim = 2
     f = open('something-%d.txt' %dim, 'w')
-    train(dim, epochs=2, save_model_path="./trained_models")
+    train(dim, epochs=2, save_model_path="./trained_models", loss_function="OI")
 
 
