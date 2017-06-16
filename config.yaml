@@ -30,6 +30,9 @@ experiments:
             batch_size: [128]
             n_steps: [20]
             gradient_clipping: [1.0]
+            max_x_abs_value: [1.0]
+            starting_point:
+                - [-1,-1]
 
     3D:
         np_training: 4000

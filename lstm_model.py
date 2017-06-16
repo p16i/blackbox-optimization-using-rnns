@@ -25,25 +25,26 @@ def get_lstm_weights(n_hidden, forget_bias, dim, scope="rnn_cell"):
 
 def apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, batch_size, scope="rnn_cell"):
 
-    x_0 = -0.0*tf.ones([batch_size, dim])
+    x_0 = tf.placeholder(tf.float32, [1,dim])
+    x_00 = tf.tile(x_0, [batch_size,1])
     h_0 = tf.zeros([batch_size, n_hidden])
     c_0 = tf.zeros([batch_size, n_hidden])
 
     state = (c_0, h_0)
-    x = x_0
+    x = x_00
     y = f(x)
     samples_x = [x]
     samples_y = [y]
 
     for i in range(n_steps):
         h, state = cell(tf.concat([x, y], 1), state, scope=scope)
-        x = tf.tanh(tf.matmul(h, weights['W_1']) + weights['b_1'])
+        x = tf.matmul(h, weights['W_1']) + weights['b_1']
         y = f(x)
 
         samples_x.append(x)
         samples_y.append(y)
 
-    return samples_x, samples_y
+    return samples_x, samples_y, x_0
 
 def build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l, scope="rnn_cell"):
     # Create Model
@@ -56,9 +57,9 @@ def build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l, scope=
 
     cell, weights = get_lstm_weights(n_hidden, forget_bias, dim, scope=scope)
 
-    samples_x, samples_y = apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, tf.shape(Xt)[0], scope=scope)
+    samples_x, samples_y,x_0 = apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, tf.shape(Xt)[0], scope=scope)
 
-    return Xt, At, mint, maxt, samples_x, samples_y
+    return Xt, At, mint, maxt, samples_x, samples_y, x_0
 
 def get_loss(samples_y, loss_type):
 
@@ -78,7 +79,9 @@ def get_loss(samples_y, loss_type):
              tf.reduce_mean(tf.reduce_sum(tf.multiply(x, np.power(0.5,np.arange(1,n_steps+1)[::-1])), axis = 0))
     }
 
-    return loss_dict[loss_type](samples_y)
+    loss = loss_dict[loss_type](samples_y)
+
+    return loss
 
 def get_min(samples_y):
     return tf.reduce_mean(tf.reduce_min(samples_y, axis = 0))
@@ -93,7 +96,7 @@ def get_train_step(loss, gradient_clipping):
 
     return train_step, rate
 
-def train_rnn_n2n(dim, n_steps = 20, learning_rate_init=0.001, learning_rate_final=0.0001, epochs=1000, n_hidden = 50, batch_size = 160, loss_function='WSUM', logger=sys.stdout, close_session=True, n_bumps=6, forget_bias=5.0, gradient_clipping=5.0, save_model_path=None ):
+def train(dim, n_steps = 20, learning_rate_init=0.001, learning_rate_final=0.0001, epochs=1000, n_hidden = 50, batch_size = 160, loss_function='WSUM', logger=sys.stdout, close_session=True, n_bumps=6, forget_bias=5.0, gradient_clipping=5.0, save_model_path=None, max_x_abs_value=1.0, starting_point=[-1,-1]):
     tf.set_random_seed(1)
 
     learning_rate_decay_rate = (learning_rate_final/learning_rate_init) ** (1.0 / (epochs-1) )
@@ -109,10 +112,14 @@ def train_rnn_n2n(dim, n_steps = 20, learning_rate_init=0.001, learning_rate_fin
 
     scope = 'rnn-cell-%dd-%d' % (dim,int(time.time()))
 
-    Xt, At, mint, maxt, samples_x, samples_y = \
+    Xt, At, mint, maxt, samples_x, samples_y, x_0 = \
         build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l, scope=scope)
 
     loss = get_loss(samples_y, loss_function)
+
+    regularizer = 100*(tf.reduce_mean(tf.maximum(max_x_abs_value,tf.abs(samples_x)))-max_x_abs_value )
+
+    loss = loss + regularizer
 
     f_min = get_min(samples_y)
 
@@ -138,6 +145,8 @@ def train_rnn_n2n(dim, n_steps = 20, learning_rate_init=0.001, learning_rate_fin
     debug("------------------------------------------------------------------------------------")
 
     learning_rate = learning_rate_init
+
+    starting_point = np.array(starting_point).reshape(1,dim)
     for ep in range(epochs):
         learning_rate = learning_rate * learning_rate_decay_rate
 
@@ -147,13 +156,13 @@ def train_rnn_n2n(dim, n_steps = 20, learning_rate_init=0.001, learning_rate_fin
             min_batch = min_train[batch*batch_size:(batch+1)*batch_size]
             max_batch = max_train[batch*batch_size:(batch+1)*batch_size]
 
-            sess.run([train_step], feed_dict={Xt: X_batch, At: A_batch, mint: min_batch, maxt: max_batch, train_rate: learning_rate})
+            sess.run([train_step], feed_dict={Xt: X_batch, At: A_batch, mint: min_batch, maxt: max_batch, train_rate: learning_rate, x_0: starting_point })
 
         if ep < 10 or ep % (epochs // 10) == 0 or ep == epochs-1:
             train_loss, train_fmin = sess.run([loss, f_min], feed_dict=\
-                                            {Xt: X_train, At: A_train, mint: min_train, maxt: max_train})
+                                              {Xt: X_train, At: A_train, mint: min_train, maxt: max_train, x_0: starting_point})
             test_loss, test_fmin = sess.run([loss, f_min], feed_dict=\
-                                            {Xt: X_test, At: A_test, mint: min_test, maxt: max_test})
+                                            {Xt: X_test, At: A_test, mint: min_test, maxt: max_test, x_0: starting_point})
             msg = "Ep: %4d | TrainLoss : %.3f | TrainMin: %.3f | TestLoss: %.3f | TestMin: %.3f" % (ep, train_loss, train_fmin, test_loss, test_fmin)
             debug(msg)
 
@@ -188,18 +197,18 @@ def train_rnn_n2n(dim, n_steps = 20, learning_rate_init=0.001, learning_rate_fin
     sess.close()
 
 def get_samples(sess, placeholders, samples_x, samples_y, data):
-    
+
     X, A, minv, maxv = data
     n_train = X.shape[0]
-    
-    n = X.shape[0]  
+
+    n = X.shape[0]
     dim = X.shape[-1]
-    
+
     Xt = placeholders["Xt"]
     At = placeholders["At"]
     mint = placeholders["mint"]
     maxt = placeholders["maxt"]
-    
+
     # Extract Samples
     samples_v_x, samples_v_y = sess.run([samples_x, samples_y], feed_dict={Xt: X, At: A, mint: minv, maxt: maxv})
     samples_v_x = np.array(samples_v_x).reshape(-1,n, dim).transpose((1,0,2))
@@ -212,13 +221,13 @@ def get_benchmark_samples(sess, f, cell, weights, dim, n_hidden, steps):
         sess.run(apply_lstm_model(f, cell, weights, steps, dim, n_hidden, 1))
     samples_benchmark_x = np.array(samples_benchmark_x).reshape(-1,1, dim).transpose((1,0,2))
     samples_benchmark_y = np.array(samples_benchmark_y).reshape(-1,1).T
-    
+
     return samples_benchmark_x, samples_benchmark_y
-	
+
 if __name__ == "__main__":
     print("run as main")
     dim = 2
     f = open('something-%d.txt' %dim, 'w')
-    train_rnn_n2n(dim, epochs=2, save_model_path="./trained_models")
+    train(dim, epochs=2, save_model_path="./trained_models")
 
 
