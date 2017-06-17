@@ -8,6 +8,7 @@ import time
 import gpfunctions as gp
 import os
 import json
+from prettytable import PrettyTable
 
 def get_lstm_weights(n_hidden, forget_bias, dim, scope="rnn_cell"):
     # Create LSTM cell
@@ -215,13 +216,57 @@ def get_samples(sess, placeholders, samples_x, samples_y, data):
 
     return samples_v_x, samples_v_y
 
-def get_benchmark_samples(sess, f, cell, weights, dim, n_hidden, steps):
+def get_benchmark_samples(sess, f, cell, weights, dim, n_hidden, steps, scope="rnn_cell"):
     samples_benchmark_x, samples_benchmark_y = \
-        sess.run(apply_lstm_model(f, cell, weights, steps, dim, n_hidden, 1))
+        sess.run(apply_lstm_model(f, cell, weights, steps, dim, n_hidden, 1, scope=scope))
     samples_benchmark_x = np.array(samples_benchmark_x).reshape(-1,1, dim).transpose((1,0,2))
     samples_benchmark_y = np.array(samples_benchmark_y).reshape(-1,1).T
 
     return samples_benchmark_x, samples_benchmark_y
+
+def load_model_params(model, debug=False):
+    tf.reset_default_graph()
+    model_path = './trained_models/%s' % model
+
+    with open('%s/network-params.json' % model_path ) as jsonfile:
+        model_params = json.load(jsonfile)
+
+    model_params['model_path'] = '%s/model' % model_path
+
+    keys = list(model_params.keys())
+    keys.sort()
+
+    table = PrettyTable()
+    table.field_names = ["Parameter", "Value"]
+
+    for k in keys:
+        table.add_row([k, model_params[k]])
+
+    table.align = 'l'
+
+    if debug:
+        print(model_path)
+        print('Load %s model' % model )
+        print(table)
+
+    # sess = tf.session()
+
+    # params_dict = {
+    #     'n_bumps': model_params['n_bumps'],
+    #     'dim' : model_params['dim'],
+    #     'n_hidden': model_params['n_hidden'],
+    #     'forget_bias': model_params['forget_bias'],
+    #     'n_steps': model_params['n_steps'],
+    #     'l': model_params['gp_length'],
+    #     'scope': model_params['scope']
+    # }
+
+    # build_training_graph(**params_dict)
+
+    # saver = tf.train.Saver()
+    # saver.restore(sess, '%s/model' % model_path)
+
+    return model_params
 
 if __name__ == "__main__":
     print("run as main")
