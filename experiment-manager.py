@@ -1,7 +1,7 @@
 import utils
 from sklearn.model_selection import ParameterGrid
 import time
-import rnn_n2n
+import lstm_model
 import fire
 import os
 import tensorflow as tf
@@ -37,7 +37,7 @@ class ExperimentManager:
             print('%3d/%d - [log-id: %s] %s ' % ( i+1, total_combinations, filename, params ))
 
             start_inner = time.time()
-            rnn_n2n.train_rnn_n2n(dimension, epochs = epochs, logger = f, save_model_path=model_location, **params)
+            lstm_model.train(dimension, epochs = epochs, logger = f, save_model_path=model_location, **params)
             tf.reset_default_graph()
             end_inner = time.time()
 
