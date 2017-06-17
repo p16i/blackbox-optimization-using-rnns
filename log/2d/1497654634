@@ -1,0 +1,36 @@
+------------------------------------------------------------------------------------
+Function Dimension            : 2
+RNN Scope                     : rnn-cell-2d-1497654634
+Number of Training Samples    : 2000
+Number of Test Samples        : 2000
+Loss                          : SUM
+Batch size                    : 128
+Number of hidden Units        : 60
+Sequence length               : 20
+Epochs                        : 600
+Learning rate init            : 0.00500
+Learning rate decay           : 0.99349
+Learning rate final           : 0.00010
+------------------------------------------------------------------------------------
+Ep:    0 | TrainLoss : -2.948 | TrainMin: -0.363 | TestLoss: -2.908 | TestMin: -0.363
+Ep:    1 | TrainLoss : -3.843 | TrainMin: -0.408 | TestLoss: -3.876 | TestMin: -0.413
+Ep:    2 | TrainLoss : -4.190 | TrainMin: -0.417 | TestLoss: -4.246 | TestMin: -0.422
+Ep:    3 | TrainLoss : -4.624 | TrainMin: -0.418 | TestLoss: -4.619 | TestMin: -0.422
+Ep:    4 | TrainLoss : -4.753 | TrainMin: -0.420 | TestLoss: -4.816 | TestMin: -0.427
+Ep:    5 | TrainLoss : -4.967 | TrainMin: -0.438 | TestLoss: -5.025 | TestMin: -0.446
+Ep:    6 | TrainLoss : -5.426 | TrainMin: -0.457 | TestLoss: -5.501 | TestMin: -0.466
+Ep:    7 | TrainLoss : -5.894 | TrainMin: -0.487 | TestLoss: -5.938 | TestMin: -0.494
+Ep:    8 | TrainLoss : -6.270 | TrainMin: -0.492 | TestLoss: -6.470 | TestMin: -0.508
+Ep:    9 | TrainLoss : -6.113 | TrainMin: -0.488 | TestLoss: -6.425 | TestMin: -0.507
+Ep:   60 | TrainLoss : -10.880 | TrainMin: -0.802 | TestLoss: -11.234 | TestMin: -0.826
+Ep:  120 | TrainLoss : -11.905 | TrainMin: -0.808 | TestLoss: -12.061 | TestMin: -0.823
+Ep:  180 | TrainLoss : -11.936 | TrainMin: -0.840 | TestLoss: -12.080 | TestMin: -0.858
+Ep:  240 | TrainLoss : -12.158 | TrainMin: -0.819 | TestLoss: -12.584 | TestMin: -0.846
+Ep:  300 | TrainLoss : -12.641 | TrainMin: -0.852 | TestLoss: -12.895 | TestMin: -0.871
+Ep:  360 | TrainLoss : -12.711 | TrainMin: -0.848 | TestLoss: -12.825 | TestMin: -0.862
+Ep:  420 | TrainLoss : -12.913 | TrainMin: -0.863 | TestLoss: -12.947 | TestMin: -0.877
+Ep:  480 | TrainLoss : -12.935 | TrainMin: -0.861 | TestLoss: -12.890 | TestMin: -0.871
+Ep:  540 | TrainLoss : -12.990 | TrainMin: -0.863 | TestLoss: -12.963 | TestMin: -0.870
+Ep:  599 | TrainLoss : -13.073 | TrainMin: -0.868 | TestLoss: -12.975 | TestMin: -0.874
+Last output: Ep:  599 | TrainLoss : -13.073 | TrainMin: -0.868 | TestLoss: -12.975 | TestMin: -0.874
+Save model to ./trained_models/rnn-cell-2d-1497654634/model
