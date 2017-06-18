@@ -18,3 +18,12 @@ def GPTF(X,A,x,l):
 
 def normalize(minv, maxv, y):
     return 2*(y-minv)/(maxv-minv)-1.0
+	
+	
+def matern_kernel(x1,x2,l,sig2,gamma):
+	dist = np.sum(np.abs(np.expand_dims(x1,axis=2) - np.expand_dims(x2,axis=1)), axis = 3)
+	return sig2*(1+gamma*np.sqrt(3)*dist/l)*np.exp(-gamma*np.sqrt(3)*dist/l)
+	
+def GP_matern(X,A,x,l):
+	k_xX = matern_kernel(x,X,l)
+    return np.squeeze(np.matmul(k_xX,  A),axis=(2,))
