@@ -64,16 +64,14 @@ def get_loss(samples_y, loss_type):
 
     n_steps = len(samples_y)
 
-    loss_dict = {
-        "MIN" : lambda x : tf.reduce_mean(tf.reduce_min(x, axis = 0)),
-        "SUM" : lambda x : tf.reduce_mean(tf.reduce_sum(x, axis = 0)),
-        "WSUM" : lambda x : \
-            tf.reduce_mean(tf.reduce_sum(tf.multiply(x, np.linspace(1/(n_steps+1),1, n_steps+1)), axis = 0)),
-        "EI" : lambda x : tf.reduce_mean(tf.reduce_sum(x, axis = 0)) -\
-            tf.reduce_mean(tf.reduce_sum([tf.reduce_min(x[:i+1],\
-                axis = 0) for i in range(n_steps)], axis = 0)),
-        "SUMMIN" : lambda x : tf.reduce_mean(tf.reduce_min(x, axis = 0)) +\
-            tf.reduce_mean(tf.reduce_sum(x, axis = 0)) ,\
+	loss_dict = {"MIN" : lambda x : tf.reduce_mean(tf.reduce_min(x, axis = 0)), 
+		 "SUM" : lambda x : tf.reduce_mean(tf.reduce_sum(x, axis = 0)),
+		 "WSUM" : lambda x : \
+		 tf.reduce_mean(tf.reduce_sum(tf.multiply(x, np.linspace(1/(n_steps+1),1, n_steps+1)), axis = 0)),
+		 "OI" : lambda x : tf.reduce_mean(tf.reduce_sum([tf.minimum(0.0,x[i]\
+							-tf.reduce_min(tf.stop_gradient(x[:i]),axis = 0)) for i in range(1,n_steps)], axis = 0)),
+		 "SUMMIN" : lambda x : tf.reduce_mean(tf.reduce_min(x, axis = 0)) +\
+		 tf.reduce_mean(tf.reduce_sum(x, axis = 0)),\
         'WSUM_EXPO': lambda x: \
              tf.reduce_mean(tf.reduce_sum(tf.multiply(x, np.power(0.5,np.arange(1,n_steps+1)[::-1])), axis = 0))
     }
