@@ -47,20 +47,20 @@ def apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, batch_size, scope
 
     return samples_x, samples_y, x_0
 
-def build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l, scope="rnn_cell"):
+def build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l, kernel=gp.rbf_kernel, function=gp.normalized_gp_function, scope="rnn_cell"):
     # Create Model
     Xt = tf.placeholder(tf.float32, [None, n_bumps, dim])
     At = tf.placeholder(tf.float32, [None, n_bumps, 1])
     mint = tf.placeholder(tf.float32, [None, 1])
     maxt = tf.placeholder(tf.float32, [None, 1])
 
-    f = lambda x: gp.normalize(mint, maxt, gp.GPTF(Xt, At, x, l))
+    f = lambda x: function("tf", Xt, At, mint, maxt, l, kernel, x)
 
     cell, weights = get_lstm_weights(n_hidden, forget_bias, dim, scope=scope)
 
-    samples_x, samples_y,x_0 = apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, tf.shape(Xt)[0], scope=scope)
+    samples_x, samples_y, x_0 = apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, tf.shape(Xt)[0], scope=scope)
 
-    return Xt, At, mint, maxt, samples_x, samples_y, x_0
+    return Xt, At, mint, maxt, samples_x, samples_y, x_0, cell, weights
 
 def get_loss(samples_y, loss_type):
 
@@ -98,6 +98,71 @@ def get_train_step(loss, gradient_clipping):
 
     return train_step, rate
 
+def train_model(sess, placeholders, samples_x, samples_y, epochs, batch_size, data_train, data_test, rate_init, rate_decay, gradient_clipping, \
+                loss_type, x_start, max_x_abs_value, log = True): 
+    
+    X_train, A_train, min_train, max_train = data_train
+    X_test, A_test, min_test, max_test = data_test
+    n_train = X_train.shape[0]
+    
+    Xt = placeholders["Xt"]
+    At = placeholders["At"]
+    mint = placeholders["mint"]
+    maxt = placeholders["maxt"]
+    x_0 = placeholders["x0"]
+    
+    loss = get_loss(samples_y, loss_type)
+	
+    regularizer = 100*(tf.reduce_mean(tf.maximum(max_x_abs_value,tf.abs(samples_x)))-max_x_abs_value )
+
+    loss = loss + regularizer
+
+    f_min = get_min(samples_y)
+
+    train_step, train_rate = get_train_step(loss, gradient_clipping)
+    
+    if log:
+        train_loss_list = []
+        test_loss_list = []
+        train_fmin_list = []
+        test_fmin_list = []
+
+    learning_rate = rate_init
+    
+    sess.run(tf.global_variables_initializer())
+    for ep in range(epochs):
+        learning_rate *= rate_decay
+        
+        for batch in range(n_train//batch_size):
+            X_batch = X_train[batch*batch_size:(batch+1)*batch_size]
+            A_batch = A_train[batch*batch_size:(batch+1)*batch_size]
+            min_batch = min_train[batch*batch_size:(batch+1)*batch_size]
+            max_batch = max_train[batch*batch_size:(batch+1)*batch_size]
+
+            sess.run([train_step],\
+                     feed_dict={Xt: X_batch, At: A_batch, mint: min_batch, maxt: max_batch, x_0: x_start,\
+                                train_rate: learning_rate})
+
+        if log:
+            train_loss, train_fmin = sess.run([loss, f_min], feed_dict=\
+                                              {Xt: X_train, At: A_train, mint: min_train, maxt: max_train, x_0: x_start})
+            test_loss, test_fmin = sess.run([loss, f_min], feed_dict=\
+                                              {Xt: X_test, At: A_test, mint: min_test, maxt: max_test, x_0:x_start})
+            train_loss_list += [train_loss]
+            test_loss_list += [test_loss]
+            train_fmin_list += [train_fmin]
+            test_fmin_list += [test_fmin]
+
+        if log and (ep < 10 or ep % (epochs // 10) == 0 or ep == epochs-1):
+            print("Ep: " +"{:4}".format(ep)+" | TrainLoss: "+"{: .3f}".format(train_loss)
+                  +" | TrainMin: "+ "{: .3f}".format(train_fmin)+ " | TestLoss: "+
+                  "{: .3f}".format(test_loss)+" | TestMin: "+ "{: .3f}".format(test_fmin))
+    
+    print("Done.")
+    if log:
+        return (train_loss_list, test_loss_list, train_fmin_list, test_fmin_list)
+    return None
+	
 def train(dim, n_steps = 20, learning_rate_init=0.001, learning_rate_final=0.0001, epochs=1000, n_hidden = 50, batch_size = 160, loss_function='WSUM', logger=sys.stdout, close_session=True, n_bumps=6, forget_bias=5.0, gradient_clipping=5.0, save_model_path=None, max_x_abs_value=1.0, starting_point=[-1,-1]):
     tf.set_random_seed(1)
 
@@ -198,7 +263,7 @@ def train(dim, n_steps = 20, learning_rate_init=0.001, learning_rate_final=0.000
 
     sess.close()
 
-def get_samples(sess, placeholders, samples_x, samples_y, data):
+def get_samples(sess, placeholders, samples_x, samples_y, data, x_start):
 
     X, A, minv, maxv = data
     n_train = X.shape[0]
@@ -210,17 +275,19 @@ def get_samples(sess, placeholders, samples_x, samples_y, data):
     At = placeholders["At"]
     mint = placeholders["mint"]
     maxt = placeholders["maxt"]
+    x_0 = placeholders["x0"]
 
     # Extract Samples
-    samples_v_x, samples_v_y = sess.run([samples_x, samples_y], feed_dict={Xt: X, At: A, mint: minv, maxt: maxv})
+    samples_v_x, samples_v_y = sess.run([samples_x, samples_y], feed_dict={Xt: X, At: A, mint: minv, maxt: maxv, x_0: x_start})
     samples_v_x = np.array(samples_v_x).reshape(-1,n, dim).transpose((1,0,2))
     samples_v_y = np.array(samples_v_y).reshape(-1,n).T
 
     return samples_v_x, samples_v_y
 
-def get_benchmark_samples(sess, f, cell, weights, dim, n_hidden, steps, scope="rnn_cell"):
-    samples_benchmark_x, samples_benchmark_y = \
-        sess.run(apply_lstm_model(f, cell, weights, steps, dim, n_hidden, 1, scope=scope))
+def get_benchmark_samples(sess, f, cell, weights, dim, n_hidden, n_steps, x_start, scope="rnn_cell"):
+    samples_x, samples_y, x_0 = apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, 1, scope="rnn_cell")
+	
+    samples_benchmark_x, samples_benchmark_y = sess.run([samples_x, samples_y], feed_dict={x_0: x_start})
     samples_benchmark_x = np.array(samples_benchmark_x).reshape(-1,1, dim).transpose((1,0,2))
     samples_benchmark_y = np.array(samples_benchmark_y).reshape(-1,1).T
 

@@ -1,29 +1,48 @@
 import numpy as np
 import tensorflow as tf
 
-def kernel(x1,x2,l):
-    import numpy as np
-    return np.exp(-1.0/l**2*np.sum((np.expand_dims(x1,axis=2) - np.expand_dims(x2,axis=1))**2, axis = 3))
 
-def GP(X,A,x,l):
-    k_xX = kernel(x,X,l)
-    return np.squeeze(np.matmul(k_xX,  A),axis=(2,))
+# GP Kernels
+def rbf_kernel(np_or_tf, x1,x2,l):
+	if np_or_tf == "np": 
+		return np.exp(-1.0/l**2*np.sum((np.expand_dims(x1,axis=2) - np.expand_dims(x2,axis=1))**2, axis = 3))
+	else:
+		return tf.exp(-1.0/l**2*tf.reduce_sum((tf.expand_dims(x1,axis=2) - tf.expand_dims(x2,axis=1))**2, axis = 3))
+	
+def matern_kernel(np_or_tf, x1,x2,l,gamma=1.0):
+	if np_or_tf == "np": 
+		dist = np.sum(np.abs(np.expand_dims(x1,axis=2) - np.expand_dims(x2,axis=1)), axis = 3)
+		return (1+gamma*np.sqrt(3)*dist/l)*np.exp(-gamma*np.sqrt(3)*dist/l)
+	else:
+		dist = tf.reduce_sum(np.abs(tf.expand_dims(x1,axis=2) - tf.expand_dims(x2,axis=1)), axis = 3)
+		return (1+gamma*np.sqrt(3.0)*dist/l)*tf.exp(-gamma*np.sqrt(3.0)*dist/l)
+	
+# GP Function
+def GP(np_or_tf, X,A,x, l, kernel):
+	if np_or_tf == "np": 
+		k_xX = kernel(np_or_tf, x,X,l)
+		return np.squeeze(np.matmul(k_xX,  A),axis=(2,))
+	else:
+		k_xX = kernel(np_or_tf, tf.expand_dims(x, axis = 1),X,l)
+		return tf.squeeze(tf.matmul(k_xX,  A),axis=(2,))
 
-def kernelTF(x1,x2,l):
-    return tf.exp(-1.0/l**2*tf.reduce_sum((tf.expand_dims(x1,axis=2) - tf.expand_dims(x2,axis=1))**2, axis = 3))
-
-def GPTF(X,A,x,l):
-    k_xX = kernelTF(tf.expand_dims(x, axis = 1),X,l)
-    return tf.squeeze(tf.matmul(k_xX,  A),axis=(2,))
 
 def normalize(minv, maxv, y):
     return 2*(y-minv)/(maxv-minv)-1.0
 	
+# Objective Priors
+def normalized_gp_function(np_or_tf, X, A, minv, maxv, l, kernel, x):
+	return normalize(minv,maxv,GP(np_or_tf, X, A, x, l, kernel))
 	
-def matern_kernel(x1,x2,l,sig2,gamma):
-	dist = np.sum(np.abs(np.expand_dims(x1,axis=2) - np.expand_dims(x2,axis=1)), axis = 3)
-	return sig2*(1+gamma*np.sqrt(3)*dist/l)*np.exp(-gamma*np.sqrt(3)*dist/l)
+def un_normalized_gp_function(X,A,minv,maxv,l,kernel,x):
+    return GP(np_or_tf, X, A, x, l, kernel)
 	
-def GP_matern(X,A,x,l):
-	k_xX = matern_kernel(x,X,l)
-    return np.squeeze(np.matmul(k_xX,  A),axis=(2,))
+def airfoil_prior(np_or_tf, X,A,minv,maxv,l,kernel,x):
+	if np_or_tf == "np": 
+		return  np.tanh(2*(GP(np_or_tf, X,A,x,l,kernel)-minv-1))
+	else:
+		return  tf.tanh(2*(GP(np_or_tf, X,A,x,l,kernel)-minv-1))
+	
+	
+
+	

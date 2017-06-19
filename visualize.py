@@ -41,7 +41,7 @@ def plot_training_data(fun, dim, nplot, heat=True):
 				plt.ylim([-1,1])
 			plt.show()
 			
-def plot_result(fun, dim, nplot, samples, samples_y):
+def plot_result(fun, dim, nplot, samples, samples_y, extent=1):
 	n2 = np.ceil(np.sqrt(nplot))+1
 	n1 = np.ceil(nplot/n2)
 	n_steps = samples.shape[1]
@@ -77,31 +77,33 @@ def plot_result(fun, dim, nplot, samples, samples_y):
 			plt.ylim([-1,1])
 		plt.show()
 		
-	plt.figure(figsize=(max(12,4*n2),max(6,3*n1)))
-	for i in range(nplot):
-		plt.subplot(n1,n2,i+1)
-		plt.plot(samples_y[i])
-	plt.suptitle("Function value at sample points")
-	plt.show()
+	if extent>1:
+		plt.figure(figsize=(max(12,4*n2),max(6,3*n1)))
+		for i in range(nplot):
+			plt.subplot(n1,n2,i+1)
+			plt.plot(samples_y[i])
+		plt.suptitle("Function value at sample points")
+		plt.show()
 	
-	#plt.figure(figsize=(20,6))
-	sorted_values = np.array([[np.min(samples_y[j,:i+1]) for i in range(n_steps+1)] for j in range(nplot)])
-	plt.plot(np.mean(sorted_values,axis=0))
-	plt.title("Average minimum observed value")
-	plt.show()
+	if extent>2:
+		#plt.figure(figsize=(20,6))
+		sorted_values = np.array([[np.min(samples_y[j,:i+1]) for i in range(n_steps+1)] for j in range(nplot)])
+		plt.plot(np.mean(sorted_values,axis=0))
+		plt.title("Average minimum observed value")
+		plt.show()
 
-def plot_gp_data_sample(nplot, X, A, minv, maxv, l):
+def plot_gp_data_sample(nplot, X, A, minv, maxv, l, kernel, function):
     n = X.shape[0]  
     dim = X.shape[-1]
     idx = np.random.choice(list(range(n)), nplot)
-    f_plot = lambda x: gp.normalize(minv[idx], maxv[idx], gp.GP(X[idx], A[idx], x, l)) 
+    f_plot = lambda x: function("np", X[idx], A[idx], minv[idx], maxv[idx], l, kernel, x) 
     plot_training_data(f_plot, dim, nplot, heat = True)
     
-def plot_gp_results_sample(nplot, X, A, minv, maxv, l, samples_x, samples_y):
+def plot_gp_results_sample(nplot, X, A, minv, maxv, l, samples_x, samples_y, kernel, function):
     n = X.shape[0]  
     dim = X.shape[-1]
     idx = np.random.choice(list(range(n)), nplot)
-    f_plot = lambda x: gp.normalize(minv[idx], maxv[idx], gp.GP(X[idx], A[idx], x, l)) 
+    f_plot = lambda x: function("np", X[idx], A[idx], minv[idx], maxv[idx], l, kernel, x) 
     plot_result(f_plot, dim, nplot, samples_x[idx], samples_y[idx])
     
 def visualize_learning(train_logs):		
