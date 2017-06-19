@@ -180,7 +180,7 @@ def train(dim, n_steps = 20, learning_rate_init=0.001, learning_rate_final=0.000
     scope = 'rnn-cell-%dd-%d' % (dim,int(time.time()))
 
     Xt, At, mint, maxt, samples_x, samples_y, x_0 = \
-        build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l, scope=scope)
+        build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l, kernel=gp.rbf_kernel, function=gp.normalized_gp_function, scope=scope)
 
     loss = get_loss(samples_y, loss_function)
 
