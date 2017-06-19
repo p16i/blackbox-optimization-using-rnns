@@ -15,8 +15,8 @@ def loadConfig():
         except yaml.YAMLError as exc:
             print(exc)
 
-def getDataPath(dim,dataset):
-    return "%s/%dD/%s" % (loadConfig()['DATA_DIR'], dim, dataset)
+def getDataPath(dim,dataset,kernel):
+    return "%s/%dD/%s/%s" % (loadConfig()['DATA_DIR'], dim, kernel, dataset)
 
 def loadData(dim, dataset):
     path = getDataPath(dim, dataset)
