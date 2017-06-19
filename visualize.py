@@ -6,7 +6,7 @@ import gpfunctions as gp
 
 
 def plot_training_data(fun, dim, nplot, heat=True):
-	n2 = np.ceil(np.sqrt(nplot))+1
+	n2 = np.ceil(np.sqrt(nplot))
 	n1 = np.ceil(nplot/n2)
 	
 	if dim==1: 
