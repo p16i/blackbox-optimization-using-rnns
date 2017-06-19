@@ -9,13 +9,21 @@ def rbf_kernel(np_or_tf, x1,x2,l):
 	else:
 		return tf.exp(-1.0/l**2*tf.reduce_sum((tf.expand_dims(x1,axis=2) - tf.expand_dims(x2,axis=1))**2, axis = 3))
 	
-def matern_kernel(np_or_tf, x1,x2,l,gamma=1.0):
+def matern32_kernel(np_or_tf, x1,x2,l,gamma=1.0):
 	if np_or_tf == "np": 
 		dist = np.sum(np.abs(np.expand_dims(x1,axis=2) - np.expand_dims(x2,axis=1)), axis = 3)
 		return (1+gamma*np.sqrt(3)*dist/l)*np.exp(-gamma*np.sqrt(3)*dist/l)
 	else:
 		dist = tf.reduce_sum(np.abs(tf.expand_dims(x1,axis=2) - tf.expand_dims(x2,axis=1)), axis = 3)
 		return (1+gamma*np.sqrt(3.0)*dist/l)*tf.exp(-gamma*np.sqrt(3.0)*dist/l)
+		
+def matern52_kernel(np_or_tf, x1,x2,l,gamma=1.0):
+	if np_or_tf == "np": 
+		dist = np.sum(np.abs(np.expand_dims(x1,axis=2) - np.expand_dims(x2,axis=1)), axis = 3)
+		return (1+gamma*np.sqrt(5)*dist/l+gamma**2*5/3*(dist/l)**2)*np.exp(-gamma*np.sqrt(5)*dist/l)
+	else:
+		dist = tf.reduce_sum(np.abs(tf.expand_dims(x1,axis=2) - tf.expand_dims(x2,axis=1)), axis = 3)
+		return (1+gamma*np.sqrt(5)*dist/l+gamma**2*5/3*(dist/l)**2)*tf.exp(-gamma*np.sqrt(5)*dist/l)
 	
 # GP Function
 def GP(np_or_tf, X,A,x, l, kernel):
@@ -39,9 +47,9 @@ def un_normalized_gp_function(X,A,minv,maxv,l,kernel,x):
 	
 def airfoil_prior(np_or_tf, X,A,minv,maxv,l,kernel,x):
 	if np_or_tf == "np": 
-		return  np.tanh(2*(GP(np_or_tf, X,A,x,l,kernel)-minv-1))
+		return  np.tanh(1.5*(GP(np_or_tf, X,A,x,l,kernel))+0.3)
 	else:
-		return  tf.tanh(2*(GP(np_or_tf, X,A,x,l,kernel)-minv-1))
+		return  tf.tanh(1.5*(GP(np_or_tf, X,A,x,l,kernel))+0.3)
 	
 	
 
