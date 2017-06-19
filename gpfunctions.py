@@ -47,9 +47,13 @@ def un_normalized_gp_function(X,A,minv,maxv,l,kernel,x):
 	
 def airfoil_prior(np_or_tf, X,A,minv,maxv,l,kernel,x):
 	if np_or_tf == "np": 
-		return  np.tanh(1.5*(GP(np_or_tf, X,A,x,l,kernel))+0.3)
+		minv = np.tanh(1.5*minv+0.3)
+		maxv = np.tanh(1.5*maxv+0.3)
+		return  normalize(minv,maxv,np.tanh(1.5*(GP(np_or_tf, X,A,x,l,kernel))+0.3))
 	else:
-		return  tf.tanh(1.5*(GP(np_or_tf, X,A,x,l,kernel))+0.3)
+		minv = tf.tanh(1.5*minv+0.3)
+		maxv = tf.tanh(1.5*maxv+0.3)
+		return  normalize(minv,maxv,tf.tanh(1.5*(GP(np_or_tf, X,A,x,l,kernel))+0.3))
 	
 	
 

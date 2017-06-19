@@ -24,6 +24,11 @@ def get_lstm_weights(n_hidden, forget_bias, dim, scope="rnn_cell"):
 
     return cell, weights
 
+def next_sample_point(x,y,state,cell,weights, scope="rnn_cell"):
+	h, state = cell(tf.concat([x, y], 1), state, scope=scope)
+	x = tf.matmul(h, weights['W_1']) + weights['b_1']
+	return x,state
+	
 def apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, batch_size, scope="rnn_cell"):
 
     x_0 = tf.placeholder(tf.float32, [1,dim])
@@ -38,8 +43,9 @@ def apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, batch_size, scope
     samples_y = [y]
 
     for i in range(n_steps):
-        h, state = cell(tf.concat([x, y], 1), state, scope=scope)
-        x = tf.matmul(h, weights['W_1']) + weights['b_1']
+        x, state = next_sample_point(x,y,state,cell,weights)
+		#h, state = cell(tf.concat([x, y], 1), state, scope=scope)
+        #x = tf.matmul(h, weights['W_1']) + weights['b_1']
         y = f(x)
 
         samples_x.append(x)
