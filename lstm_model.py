@@ -68,7 +68,7 @@ def build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l, kernel
 
     return Xt, At, mint, maxt, samples_x, samples_y, x_0, cell, weights
 
-def get_loss(samples_y, loss_type):
+def get_loss(samples_y, loss_type, samples_x=None):
 
     n_steps = len(samples_y)
 
@@ -84,10 +84,19 @@ def get_loss(samples_y, loss_type):
         "SUMMIN" : lambda x : tf.reduce_mean(tf.reduce_min(x, axis = 0)) +\
             tf.reduce_mean(tf.reduce_sum(x, axis = 0)) ,\
         'WSUM_EXPO': lambda x: \
-             tf.reduce_mean(tf.reduce_sum(tf.multiply(x, np.power(0.5,np.arange(1,n_steps+1)[::-1])), axis = 0))
+             tf.reduce_mean(tf.reduce_sum(tf.multiply(x, np.power(0.5,np.arange(1,n_steps+1)[::-1])), axis = 0)),
+		'SUMOI' : lambda x: \
+            tf.reduce_mean( tf.reduce_sum( [tf.reduce_min( x[i] - tf.reduce_min(x[:i]), 0  ) for i in range(1, n_steps) ], axis = 0  ), axis=0 ) + \
+			tf.reduce_mean(tf.reduce_sum(x, axis = 0)),
+		'DIST' : lambda x, y: \
+			tf.reduce_mean(tf.reduce_sum([tf.reduce_sum([(1.0)/(0.1+tf.reduce_sum((x[i]-x[j])**2)) \
+				for j in range(i)],axis = 0) for i in range(1,n_steps)],axis=0))
     }
-
-    loss = loss_dict[loss_type](samples_y)
+	
+    if loss_type=='DIST':
+	    loss = loss_dict['DIST'](samples_x, samples_y)
+    else:
+        loss = loss_dict[loss_type](samples_y)
 
     return loss
 
@@ -107,6 +116,7 @@ def get_train_step(loss, gradient_clipping):
 def train_model(sess, placeholders, samples_x, samples_y, epochs, batch_size, data_train, data_test, rate_init, rate_decay, gradient_clipping, \
                 loss_type, x_start, max_x_abs_value, log = True): 
     
+    print("Build Graph...")
     X_train, A_train, min_train, max_train = data_train
     X_test, A_test, min_test, max_test = data_test
     n_train = X_train.shape[0]
@@ -117,7 +127,7 @@ def train_model(sess, placeholders, samples_x, samples_y, epochs, batch_size, da
     maxt = placeholders["maxt"]
     x_0 = placeholders["x0"]
     
-    loss = get_loss(samples_y, loss_type)
+    loss = get_loss(samples_y, loss_type, samples_x)
 	
     regularizer = 100*(tf.reduce_mean(tf.maximum(max_x_abs_value,tf.abs(samples_x)))-max_x_abs_value )
 
