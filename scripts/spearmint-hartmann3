@@ -1,0 +1,17 @@
+#!/bin/bash
+
+EXPERIMENT_NAME=hartmann_3d
+EXPERIMENT_DIR=spearmint-config/$EXPERIMENT_NAME
+STEP=25
+NO_RUN=100
+source python2-env/bin/activate
+
+for i in $(seq 1 $NO_RUN)
+do
+    echo "---------- Run $i -----------"
+    mongo spearmint --eval "db.$EXPERIMENT_NAME.hypers.drop(); db.$EXPERIMENT_NAME.jobs.drop(); db.dropDatabase()" && \
+        rm -rf $EXPERIMENT_DIR/output/* && \
+        python bayesian-optimization/Spearmint/spearmint/main.py spearmint-config/$EXPERIMENT_NAME/ --steps $STEP && \
+        cat $EXPERIMENT_DIR/output/* | grep 'job #' > $EXPERIMENT_DIR/runs/`date +%s`
+done
+
