@@ -1,8 +1,0 @@
-Job launching after 0.20 seconds in submission.
-Running python job.
-Changed into dir /Users/heytitle/projects/neural-network-project/spearmint-config/goldstein_price_2d
-Importing goldstein_price_2d.py
-Running goldstein_price_2d.main()
-Got result 219450.618821
-Completed successfully in 0.03 seconds. [{u'main': 219450.61882071887}]
-job # 3 : (1.94829,-1.59998)	->	y=219450.618821

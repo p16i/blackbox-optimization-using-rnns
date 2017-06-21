@@ -1,9 +1,0 @@
-Job launching after 0.20 seconds in submission.
-Running python job.
-Changed into dir /Users/heytitle/projects/neural-network-project/spearmint-config/gp-test
-Importing gp_test.py
-Running gp_test.main()
-Got result 0.0927878845156
-Completed successfully in 0.04 seconds. [{u'main': 0.0927878845156449}]
-Loading GP-Test 400th
-job # 2 : (0.00000,0.00000)	->	y=0.092788
