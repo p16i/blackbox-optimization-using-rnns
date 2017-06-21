@@ -1,0 +1,27 @@
+{
+    "language"        : "PYTHON",
+    "main-file"       : "run.py",
+    "experiment-name" : "hartmann_3d",
+    "likelihood"      : "NOISELESS",
+    "variables" : {
+        "x1" : {
+            "type" : "FLOAT",
+            "size" : 1,
+            "min"  : 0,
+            "max"  : 1
+        },
+        "x2" : {
+            "type" : "FLOAT",
+            "size" : 1,
+            "min"  : 0,
+            "max"  : 1
+        },
+        "x3" : {
+            "type" : "FLOAT",
+            "size" : 1,
+            "min"  : 0,
+            "max"  : 1
+        }
+    }
+}
+
