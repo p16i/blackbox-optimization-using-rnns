@@ -65,19 +65,25 @@ def goldstein_price_tf(x):
 
     return tf.reshape(y, (-1,1))
 
-def hartmann3(x):
-    x = (x+1)/2
+def hartmann3(x, normalize=True):
 
     minv = -3.86278
     maxv = 18.06
+
+    x = np.array(x)
 
     A = np.array([[3.0, 10, 30],[0.1, 10, 35],[3.0, 10, 30],[0.1, 10, 35]])
     P = 0.0001 * np.array([[3689, 1170, 2673], [4699, 4387, 7470], [1091, 8732, 5547], [381, 5743, 8828]])
     alpha = np.array([1.0, 1.2, 3.0, 3.2])
 
-    y = np.sum(alpha[:,np.newaxis] * np.exp(-A*((x[:,:,np.newaxis,:]-P)**2)),axis=(-1,-2))
+    diff = np.power(np.subtract(P, x.T),2)
+    ss   = np.sum(-A*diff, axis=1)
+    exp  = np.exp(ss)
 
-    y = 2*(y-minv)/(maxv-minv)-1
+    y = -np.dot(alpha, exp)
+
+    if normalize:
+        y = 2*(y-minv)/(maxv-minv)-1
 
     return y
 
