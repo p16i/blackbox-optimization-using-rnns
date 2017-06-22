@@ -28,7 +28,7 @@ def next_sample_point(x,y,state,cell,weights, scope="rnn_cell"):
 	h, state = cell(tf.concat([x, y], 1), state, scope=scope)
 	x = tf.matmul(h, weights['W_1']) + weights['b_1']
 	return x,state
-	
+
 def apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, batch_size, scope="rnn_cell"):
 
     x_0 = tf.placeholder(tf.float32, [1,dim])
@@ -92,7 +92,7 @@ def get_loss(samples_y, loss_type, samples_x=None):
 			tf.reduce_mean(tf.reduce_sum([tf.reduce_sum([(1.0)/(0.1+tf.reduce_sum((x[i]-x[j])**2)) \
 				for j in range(i)],axis = 0) for i in range(1,n_steps)],axis=0))
     }
-	
+
     if loss_type=='DIST':
 	    loss = loss_dict['DIST'](samples_x, samples_y)
     else:
@@ -114,21 +114,21 @@ def get_train_step(loss, gradient_clipping):
     return train_step, rate
 
 def train_model(sess, placeholders, samples_x, samples_y, epochs, batch_size, data_train, data_test, rate_init, rate_decay, gradient_clipping, \
-                loss_type, x_start, max_x_abs_value, log = True): 
-    
+                loss_type, x_start, max_x_abs_value, log = True):
+
     print("Build Graph...")
     X_train, A_train, min_train, max_train = data_train
     X_test, A_test, min_test, max_test = data_test
     n_train = X_train.shape[0]
-    
+
     Xt = placeholders["Xt"]
     At = placeholders["At"]
     mint = placeholders["mint"]
     maxt = placeholders["maxt"]
     x_0 = placeholders["x0"]
-    
+
     loss = get_loss(samples_y, loss_type, samples_x)
-	
+
     regularizer = 100*(tf.reduce_mean(tf.maximum(max_x_abs_value,tf.abs(samples_x)))-max_x_abs_value )
 
     loss = loss + regularizer
@@ -136,7 +136,7 @@ def train_model(sess, placeholders, samples_x, samples_y, epochs, batch_size, da
     f_min = get_min(samples_y)
 
     train_step, train_rate = get_train_step(loss, gradient_clipping)
-    
+
     if log:
         train_loss_list = []
         test_loss_list = []
@@ -144,11 +144,11 @@ def train_model(sess, placeholders, samples_x, samples_y, epochs, batch_size, da
         test_fmin_list = []
 
     learning_rate = rate_init
-    
+
     sess.run(tf.global_variables_initializer())
     for ep in range(epochs):
         learning_rate *= rate_decay
-        
+
         for batch in range(n_train//batch_size):
             X_batch = X_train[batch*batch_size:(batch+1)*batch_size]
             A_batch = A_train[batch*batch_size:(batch+1)*batch_size]
@@ -173,12 +173,12 @@ def train_model(sess, placeholders, samples_x, samples_y, epochs, batch_size, da
             print("Ep: " +"{:4}".format(ep)+" | TrainLoss: "+"{: .3f}".format(train_loss)
                   +" | TrainMin: "+ "{: .3f}".format(train_fmin)+ " | TestLoss: "+
                   "{: .3f}".format(test_loss)+" | TestMin: "+ "{: .3f}".format(test_fmin))
-    
+
     print("Done.")
     if log:
         return (train_loss_list, test_loss_list, train_fmin_list, test_fmin_list)
     return None
-	
+
 def train(dim, n_steps = 20, learning_rate_init=0.001, learning_rate_final=0.0001, epochs=1000, n_hidden = 50, batch_size = 160, loss_function='WSUM', logger=sys.stdout, close_session=True, n_bumps=6, forget_bias=5.0, gradient_clipping=5.0, save_model_path=None, max_x_abs_value=1.0, starting_point=[-1,-1]):
     tf.set_random_seed(1)
 
@@ -302,7 +302,7 @@ def get_samples(sess, placeholders, samples_x, samples_y, data, x_start):
 
 def get_benchmark_samples(sess, f, cell, weights, dim, n_hidden, n_steps, x_start, scope="rnn_cell"):
     samples_x, samples_y, x_0 = apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, 1, scope="rnn_cell")
-	
+
     samples_benchmark_x, samples_benchmark_y = sess.run([samples_x, samples_y], feed_dict={x_0: x_start})
     samples_benchmark_x = np.array(samples_benchmark_x).reshape(-1,1, dim).transpose((1,0,2))
     samples_benchmark_y = np.array(samples_benchmark_y).reshape(-1,1).T
@@ -353,10 +353,58 @@ def load_model_params(model, debug=False):
 
     return model_params
 
+def generate_sample_sequence(sess, model_params, x0, steps, obj_func):
+    h_0 = tf.zeros([1, model_params['n_hidden']])
+    c_0 = tf.zeros([1, model_params['n_hidden']])
+
+    x = tf.constant(x0, dtype=tf.float32)
+    state = (c_0, h_0)
+
+    y0 = obj_func(x0)
+    y = tf.constant(y0, dtype=tf.float32)
+
+    samples_x = [x0]
+    samples_y = [y0]
+
+    for i in range(steps):
+        x, state = next_sample_point(x,y,state, model_params['_cell'], model_params['_weights'], scope=model_params['scope'])
+        x_np = sess.run(x)
+        y_np = obj_func(x_np)
+        y = tf.constant(y_np, dtype=tf.float32)
+
+        samples_x += [x_np]
+        samples_y += [y_np]
+
+    return samples_x, samples_y
+
+def load_trained_model(model, debug=False):
+    model_params = load_model_params(model, debug=True)
+    tf.reset_default_graph()
+
+    sess = tf.Session()
+
+    lstm_params = {
+        'dim' : model_params['dim'],
+        'n_hidden': model_params['n_hidden'],
+        'forget_bias': model_params['forget_bias'],
+        'scope': model_params['scope']
+    }
+    cell, weights = get_lstm_weights(**lstm_params)
+
+    saver = tf.train.Saver()
+    saver.restore(sess, model_params['model_path'])
+
+    model_params['_cell'] = cell
+    model_params['_weights'] = weights
+
+    return sess, model_params
+
 if __name__ == "__main__":
     print("run as main")
     dim = 2
     f = open('something-%d.txt' %dim, 'w')
     train(dim, epochs=2, save_model_path="./trained_models", loss_function="OI_UPDATED")
+
+
 
 
