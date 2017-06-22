@@ -21,7 +21,6 @@ experiments:
         no_training: 2000
         no_testing : 2000
         best_model: rnn-cell-2d-1497306764
-
         hyperparameters:
             learning_rate_init: [0.005]
             learning_rate_final: [0.0001]
@@ -41,11 +40,13 @@ experiments:
         hyperparameters:
             learning_rate_init: [0.005]
             learning_rate_final: [0.0001]
-            n_hidden: [10,30,60,100]
-            loss_function: ['MIN','SUM','WSUM','OI', 'SUMMIN', 'WSUM_EXPO']
+            n_hidden: [60,100]
+            loss_function: ['MIN','OI', 'SUMMIN', 'WSUM_EXPO']
             batch_size: [128]
             n_steps: [20]
             gradient_clipping: [1.0]
+            starting_point:
+                - [-1,-1,-1]
 
     4D:
         np_training: 6000

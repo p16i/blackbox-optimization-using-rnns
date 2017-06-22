@@ -7,7 +7,7 @@ import os
 import tensorflow as tf
 
 class ExperimentManager:
-    def run( self, dimension, log_dir, epochs):
+    def run( self, kernel, dimension, log_dir, epochs):
         # todo: check if log dir doesn't exists otherwise fail
         config = utils.loadConfig()
         log_location = config['BASE_LOG_DIR']  + '/' + log_dir
@@ -23,7 +23,7 @@ class ExperimentManager:
         param_grid = list(ParameterGrid(hyper_params))
 
         total_combinations = len(param_grid)
-        print('Running experiments of %dD with %d hyperparameter combinations' % (dimension, total_combinations) )
+        print('Running experiments of %dD-%s with %d hyperparameter combinations' % (dimension, kernel, total_combinations) )
         print('log output to %s' % log_location)
         print('save model to %s' % model_location)
 
@@ -37,7 +37,7 @@ class ExperimentManager:
             print('%3d/%d - [log-id: %s] %s ' % ( i+1, total_combinations, filename, params ))
 
             start_inner = time.time()
-            lstm_model.train(dimension, epochs = epochs, logger = f, save_model_path=model_location, **params)
+            lstm_model.train(dimension, kernel=kernel, epochs = epochs, logger = f, save_model_path=model_location, **params)
             tf.reset_default_graph()
             end_inner = time.time()
 

@@ -18,8 +18,8 @@ def loadConfig():
 def getDataPath(dim,dataset,kernel):
     return "%s/%dD/%s/%s" % (loadConfig()['DATA_DIR'], dim, kernel, dataset)
 
-def loadData(dim, dataset):
-    path = getDataPath(dim, dataset)
+def loadData(dim, dataset, kernel ):
+    path = getDataPath(dim, dataset, kernel=kernel)
     return np.load(path+"/X.npy"), np.load(path+"/A.npy"), np.load(path+"/minv.npy"), np.load(path+"/maxv.npy")
 
 def goldstein_price(x_1,x_2):

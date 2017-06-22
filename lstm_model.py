@@ -43,7 +43,7 @@ def apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, batch_size, scope
     samples_y = [y]
 
     for i in range(n_steps):
-        x, state = next_sample_point(x,y,state,cell,weights)
+        x, state = next_sample_point(x,y,state,cell,weights, scope=scope)
 		#h, state = cell(tf.concat([x, y], 1), state, scope=scope)
         #x = tf.matmul(h, weights['W_1']) + weights['b_1']
         y = f(x)
@@ -77,9 +77,7 @@ def get_loss(samples_y, loss_type, samples_x=None):
         "SUM" : lambda x : tf.reduce_mean(tf.reduce_sum(x, axis = 0)),
         "WSUM" : lambda x : \
             tf.reduce_mean(tf.reduce_sum(tf.multiply(x, np.linspace(1/(n_steps+1),1, n_steps+1)), axis = 0)),
-        "OI": lambda x: \
-            tf.reduce_mean( tf.reduce_sum( [tf.reduce_min( x[i] - tf.reduce_min(x[:i]), 0  ) for i in range(1, n_steps) ], axis = 0  ), axis=0 ),
-        "OI_UPDATED" : lambda x : \
+        "OI" : lambda x : \
             tf.reduce_mean( tf.reduce_sum( [tf.minimum(0.0,x[i] -tf.reduce_min(tf.stop_gradient(x[:i]),axis = 0)) for i in range(1,n_steps)], axis = 0)),
         "SUMMIN" : lambda x : tf.reduce_mean(tf.reduce_min(x, axis = 0)) +\
             tf.reduce_mean(tf.reduce_sum(x, axis = 0)) ,\
@@ -179,7 +177,7 @@ def train_model(sess, placeholders, samples_x, samples_y, epochs, batch_size, da
         return (train_loss_list, test_loss_list, train_fmin_list, test_fmin_list)
     return None
 
-def train(dim, n_steps = 20, learning_rate_init=0.001, learning_rate_final=0.0001, epochs=1000, n_hidden = 50, batch_size = 160, loss_function='WSUM', logger=sys.stdout, close_session=True, n_bumps=6, forget_bias=5.0, gradient_clipping=5.0, save_model_path=None, max_x_abs_value=1.0, starting_point=[-1,-1]):
+def train(dim, kernel = "rbf", n_steps = 20, learning_rate_init=0.001, learning_rate_final=0.0001, epochs=1000, n_hidden = 50, batch_size = 160, loss_function='WSUM', logger=sys.stdout, close_session=True, n_bumps=6, forget_bias=5.0, gradient_clipping=5.0, save_model_path=None, max_x_abs_value=1.0, starting_point=[-1,-1]):
     tf.set_random_seed(1)
 
     learning_rate_decay_rate = (learning_rate_final/learning_rate_init) ** (1.0 / (epochs-1) )
@@ -188,15 +186,23 @@ def train(dim, n_steps = 20, learning_rate_init=0.001, learning_rate_final=0.000
     debug = lambda x : (print(x, file=logger), logger.flush())
 
     # load data
-    X_train, A_train, min_train, max_train = utils.loadData(dim, 'training')
-    X_test, A_test, min_test, max_test = utils.loadData(dim, 'testing')
+    X_train, A_train, min_train, max_train = utils.loadData(dim, "training", kernel = kernel)
+    X_test, A_test, min_test, max_test = utils.loadData(dim, "testing", kernel = kernel)
 
     l = 2/n_bumps*np.sqrt(dim)
 
     scope = 'rnn-cell-%dd-%d' % (dim,int(time.time()))
 
-    Xt, At, mint, maxt, samples_x, samples_y, x_0 = \
-        build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l, kernel=gp.rbf_kernel, function=gp.normalized_gp_function, scope=scope)
+    kernel_func = None
+    if kernel is "rbf":
+        kernel_func = gp.rbf_kernel
+    elif kernel is "matern32":
+        kernel_func = gp.matern32_kernel
+    elif kernel is "matern52":
+        kernel_func = gp.matern52_kernel
+
+    Xt, At, mint, maxt, samples_x, samples_y, x_0, cell, weights = \
+        build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l, kernel=kernel_func, function=gp.normalized_gp_function, scope=scope)
 
     loss = get_loss(samples_y, loss_function)
 
