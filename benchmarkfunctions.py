@@ -72,6 +72,9 @@ def hartmann3(x, normalize=True):
 
     x = np.array(x)
 
+    if normalize:
+        x = (x+1)/2
+
     A = np.array([[3.0, 10, 30],[0.1, 10, 35],[3.0, 10, 30],[0.1, 10, 35]])
     P = 0.0001 * np.array([[3689, 1170, 2673], [4699, 4387, 7470], [1091, 8732, 5547], [381, 5743, 8828]])
     alpha = np.array([1.0, 1.2, 3.0, 3.2])
@@ -88,24 +91,33 @@ def hartmann3(x, normalize=True):
     return y
 
 def hartmann3_tf(x):
+    x = tf.reshape(x, [-1,1])
     x = (x+1)/2
-    x = tf.expand_dims(x,0)
 
     minv = -3.86278
     maxv = 18.06
 
     A = tf.constant([[3.0, 10, 30],[0.1, 10, 35],[3.0, 10, 30],[0.1, 10, 35]], dtype=tf.float32)
     P = 0.0001 * tf.constant([[3689, 1170, 2673], [4699, 4387, 7470], [1091, 8732, 5547], [381, 5743, 8828]], dtype=tf.float32)
-    alpha = tf.constant([1.0, 1.2, 3.0, 3.2], dtype=tf.float32)
+    alpha = tf.constant([1.0, 1.2, 3.0, 3.2], dtype=tf.float32, shape= [1,4])
 
-    y = tf.reduce_sum(tf.expand_dims(alpha,1) * tf.exp(-A*((tf.expand_dims(x,2)-P)**2)),axis=(-1,-2))
+    diff = tf.subtract(P, tf.transpose(x))**2
+
+    ss = tf.reduce_sum( tf.multiply(-A, diff ), 1)
+    ss = tf.reshape(ss, [-1,1])
+    exp  = tf.exp(ss)
+
+    y = -tf.matmul(alpha, exp)
 
     y = 2*(y-minv)/(maxv-minv)-1
 
     return tf.reshape(y, (-1,1))
 
-def hartmann6(x):
-    x = (x+1)/2
+def hartmann6(x, normalize=True):
+    x = np.array(x)
+
+    if normalize:
+        x = (x+1)/2
 
     minv = -3.32237
     maxv = 38.7
@@ -116,9 +128,15 @@ def hartmann6(x):
                          [2348, 1451, 3522, 2883, 3047, 6650],[4047, 8828, 8732, 5743, 1091, 381]])
     alpha = np.array([1, 1.2, 3, 3.2])
 
-    y = np.sum(alpha[:,np.newaxis] * np.exp(-A*((x[:,:,np.newaxis,:]-P)**2)),axis=(-1,-2))
+    diff = np.power(np.subtract(P, x.T),2)
+    ss   = np.sum(-A*diff, axis=1)
+    print(ss.shape)
+    exp  = np.exp(ss)
 
-    y = 2*(y-minv)/(maxv-minv)-1
+    y = -np.dot(alpha, exp)
+
+    if normalize:
+        y = 2*(y-minv)/(maxv-minv)-1
 
     return y
 
