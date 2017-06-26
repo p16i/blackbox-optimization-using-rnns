@@ -123,3 +123,17 @@ def visualize_learning(train_logs):
 	plt.title("Validation Minimum")
 	plt.show()
 	
+def plot_min_curves(samples_list,names_list):
+    # samples_list = [samples1, samples2, ..] with sample1.shape = (n_test,n_steps)
+    # names_list = ["MIN", "SUM", "OI", "Random", "SkOpt"]
+    
+    # Example: plot_min_curves([np.random.normal(size=(n_test,n_steps))+i*0.2*np.random.normal(size=random_samples.shape)\
+    #             for i in range(5)],["MIN", "SUM", "OI", "Random", "SkOpt"])
+    for name, samples in zip(names_list,samples_list):
+        samples_sorted = [np.min(samples[:,:i],axis=1) for i in range(1,samples.shape[1]+1)]
+        samples_sorted = np.mean(np.array(samples_sorted),axis = 1)
+        
+        plt.plot(samples_sorted,label=name)
+    plt.legend()
+    plt.show()
+	
