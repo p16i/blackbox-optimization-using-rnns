@@ -11,7 +11,8 @@ def simulate(airfoil_file_name, path):
     path: str value for the directory of the airfoil_file path
     This function runs simulate the airfoil and stores the results in the same directory as a .log file
     """
-    xfoilpath = '/Applications/Xfoil.app/Contents/Resources/xfoil'
+    #xfoilpath = '/Applications/Xfoil.app/Contents/Resources/xfoil'
+    xfoilpath = 'C:/Users/User/Downloads/XFOIL6.99/xfoil'
     process = subprocess.Popen(xfoilpath,stdin=subprocess.PIPE,
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE,
