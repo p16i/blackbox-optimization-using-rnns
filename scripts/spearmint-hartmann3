@@ -1,9 +1,10 @@
 #!/bin/bash
 
-EXPERIMENT_NAME=hartmann_3d
+EXPERIMENT_NAME=$1
 EXPERIMENT_DIR=spearmint-config/$EXPERIMENT_NAME
-STEP=25
-NO_RUN=100
+STEP=2
+NO_RUN=10
+echo "Running $1 experiment with $STEP and $NO_RUN runs"
 source python2-env/bin/activate
 
 for i in $(seq 1 $NO_RUN)
@@ -14,4 +15,3 @@ do
         python bayesian-optimization/Spearmint/spearmint/main.py spearmint-config/$EXPERIMENT_NAME/ --steps $STEP && \
         cat $EXPERIMENT_DIR/output/* | grep 'job #' > $EXPERIMENT_DIR/runs/`date +%s`
 done
-

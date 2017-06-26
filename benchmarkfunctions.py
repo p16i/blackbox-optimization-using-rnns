@@ -130,7 +130,6 @@ def hartmann6(x, normalize=True):
 
     diff = np.power(np.subtract(P, x.T),2)
     ss   = np.sum(-A*diff, axis=1)
-    print(ss.shape)
     exp  = np.exp(ss)
 
     y = -np.dot(alpha, exp)

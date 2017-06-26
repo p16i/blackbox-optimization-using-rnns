@@ -3,6 +3,8 @@ DATA_DIR: ./Data
 BASE_LOG_DIR: ./log
 MODEL_DIR: ./trained_models
 
+SPEARMINT_CONF_BASE_DIR: './spearmint-config'
+
 experiments:
     1D:
         np_training: 2000
