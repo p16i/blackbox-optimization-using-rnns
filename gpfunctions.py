@@ -55,6 +55,14 @@ def airfoil_prior(np_or_tf, X,A,minv,maxv,l,kernel,x):
 		maxv = tf.tanh(1.5*maxv+0.3)
 		return  normalize(minv,maxv,tf.tanh(1.5*(GP(np_or_tf, X,A,x,l,kernel))+0.3))
 
+def kernel_function(kernel):
+    kernel_func = None
+    if kernel is "rbf":
+        kernel_func = rbf_kernel
+    elif kernel is "matern32":
+        kernel_func = matern32_kernel
+    elif kernel is "matern52":
+        kernel_func = matern52_kernel
 
-
+    return kernel_func
 

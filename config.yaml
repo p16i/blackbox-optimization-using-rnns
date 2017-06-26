@@ -4,6 +4,7 @@ BASE_LOG_DIR: ./log
 MODEL_DIR: ./trained_models
 
 SPEARMINT_CONF_BASE_DIR: './spearmint-config'
+SKOPT_RESULT_BASE_DIR: './skopt-result'
 
 experiments:
     1D:
