@@ -25,3 +25,7 @@ def get_samples_sk(X,A,minv,maxv, l, dim, n_steps, function, kernel, n, x_start)
 			samples_sk_y += [np.array(res.func_vals)]
 			
 	return np.array(samples_sk_x), np.array(samples_sk_y)
+	
+def save_samples(samples_x, samples_y, directory):
+	np.save( directory + "/samples_x", samples_x)
+    np.save( directory + "/samples_y", samples_y)
