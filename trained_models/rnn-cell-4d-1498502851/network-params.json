@@ -1,0 +1,1 @@
+{"learning_rate_init": 0.005, "scope": "rnn-cell-4d-1498502851", "epochs": 600, "loss_function": "OI", "forget_bias": 5.0, "n_steps": 20, "gp_length": 0.6666666666666666, "dim": 4, "n_hidden": 100, "learning_rate_final": 0.0001, "n_bumps": 6}
