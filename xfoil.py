@@ -43,9 +43,9 @@ class Command(object):
                             universal_newlines=True)
 
                 out, err = self.process.communicate(
-                                     # "plop\n"
-                                      #"g\n"
-                                      #" \n"
+                                      "plop\n"
+                                      "g\n"
+                                      " \n"
                                       "load {}\n"
                                       "foil{}\n"
                                       "pane\n"

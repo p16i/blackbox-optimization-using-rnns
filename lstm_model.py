@@ -385,6 +385,7 @@ def generate_sample_sequence(sess, model_params, x0, steps, obj_func):
     samples_y = [y0]
 
     for i in range(steps):
+        print(i)
         x, state = next_sample_point(x,y,state, model_params['_cell'], model_params['_weights'], scope=model_params['scope'])
         x_np = sess.run(x)
         y_np = obj_func(x_np)
