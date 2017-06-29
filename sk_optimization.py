@@ -16,10 +16,14 @@ class SKOptimizer:
 
         samples_sk_x = []
         samples_sk_y = []
-		
-        opt = {"gp": skopt.gp_minimize,"forest": skopt.forest_minimize, 
-		"random": skopt.dummy_minimize, "gbrt": skopt.gbrt_minimize}[optimizer]
-		
+
+        opt = {
+            "gp": skopt.gp_minimize,
+            "forest": skopt.forest_minimize,
+            "random": skopt.dummy_minimize,
+            "gbrt": skopt.gbrt_minimize
+        }[optimizer]
+
         for i in range(n):
 
             res = opt(lambda x: fun(x,i), [(-1.0, 1.0)]*dim, n_calls=n_steps, x0=x_start)
@@ -29,8 +33,8 @@ class SKOptimizer:
 
         return np.array(samples_sk_x).reshape(n, n_steps, dim), np.array(samples_sk_y).reshape(n, n_steps)
 
-    def run(self, dim, kernel, n_steps=21, no_testing_func=10):
-        print("Optimizing for first %d functions of %d-%s testing data" % (no_testing_func, dim, kernel))
+    def run(self, dim, kernel, n_steps=21, no_testing_func=10, optimizer = 'gp'):
+        print("Optimizing for first %d functions of %d-%s testing data using %s optimizer" % (no_testing_func, dim, kernel, optimizer))
         conf = utils.loadConfig()
 
         x0 = conf['experiments']["%dD" % dim]['hyperparameters']['starting_point'][0]
@@ -42,9 +46,10 @@ class SKOptimizer:
         l = 2/n_bumps*np.sqrt(dim)
 
         kernel_func = gp.kernel_function(kernel)
-        samples_x, samples_y = self.get_samples_sk(X, A, minv, maxv, l, dim, n_steps, gp.normalized_gp_function, kernel_func, no_testing_func, x0)
 
-        directory = '%sd-%s' % ( dim, kernel )
+        samples_x, samples_y = self.get_samples_sk(X, A, minv, maxv, l, dim, n_steps, gp.normalized_gp_function, kernel_func, no_testing_func, x0, optimizer = optimizer)
+
+        directory = '%s/%sd-%s' % ( optimizer, dim, kernel )
 
         print('Saving data with prefix %s' % directory )
         self.save_samples(samples_x, samples_y, directory)
