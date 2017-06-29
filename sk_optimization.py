@@ -6,7 +6,7 @@ import utils
 import gpfunctions as gp
 
 class SKOptimizer:
-    def get_samples_sk(self, X,A,minv,maxv, l, dim, n_steps, function, kernel, n, x_start):
+    def get_samples_sk(self, X,A,minv,maxv, l, dim, n_steps, function, kernel, n, x_start, optimizer):
         # performs skopt optimization for the first n gp-functions specified by the parameters X,A,minv,maxv
 
         # the i-th gp-function
@@ -16,8 +16,12 @@ class SKOptimizer:
 
         samples_sk_x = []
         samples_sk_y = []
+		
+        opt = {"gp": skopt.gp_minimize,"forest": skopt.forest_minimize, 
+		"random": skopt.dummy_minimize, "gbrt": skopt.gbrt_minimize}[optimizer]
+		
         for i in range(n):
-            res = skopt.gp_minimize(lambda x: fun(x,i), [(-1.0, 1.0)]*dim, n_calls=n_steps, x0=x_start)
+            res = opt(lambda x: fun(x,i), [(-1.0, 1.0)]*dim, n_calls=n_steps, x0=x_start)
             samples_sk_x += [np.array(res.x_iters)]
             samples_sk_y += [np.array(res.func_vals)]
 
