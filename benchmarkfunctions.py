@@ -139,21 +139,31 @@ def hartmann6(x, normalize=True):
 
     return y
 
-def hartmann6_tf(x):
-    x = (x+1)/2
-    x = tf.expand_dims(x,0)
+def hartmann6_tf(x, normalize=True):
 
-    minv = -3.32237
-    maxv = 38.7
+	x = tf.reshape(x, [-1,1])
 
-    A = tf.constant([[10, 3, 17, 3.5, 1.7, 8],[0.05, 10, 17, 0.1, 8, 14], [3, 3.5, 1.7, 10, 17, 8],\
-                  [17, 8, 0.05, 10, 0.1, 14]], dtype=tf.float32)
-    P = 1e-4 * tf.constant([[1312, 1696, 5569, 124, 8283, 5886],[2329, 4135, 8307, 3736, 1004, 9991],\
-                         [2348, 1451, 3522, 2883, 3047, 6650],[4047, 8828, 8732, 5743, 1091, 381]], dtype=tf.float32)
-    alpha = tf.constant([1, 1.2, 3, 3.2], dtype=tf.float32)
+	if normalize :
+		x = (x+1)/2
 
-    y = tf.reduce_sum(tf.expand_dims(alpha,1) * tf.exp(-A*((tf.expand_dims(x,2)-P)**2)),axis=(-1,-2))
+	minv = -3.32237
+	maxv = 38.7
 
-    y = 2*(y-minv)/(maxv-minv)-1
+	A = tf.constant([[10, 3, 17, 3.5, 1.7, 8],[0.05, 10, 17, 0.1, 8, 14], [3, 3.5, 1.7, 10, 17, 8],\
+					[17, 8, 0.05, 10, 0.1, 14]], dtype=tf.float32)
+	P = 1e-4 * tf.constant([[1312, 1696, 5569, 124, 8283, 5886],[2329, 4135, 8307, 3736, 1004, 9991],\
+							[2348, 1451, 3522, 2883, 3047, 6650],[4047, 8828, 8732, 5743, 1091, 381]], dtype=tf.float32)
+	alpha = tf.constant([1, 1.2, 3, 3.2], dtype=tf.float32)
 
-    return tf.reshape(y, (-1,1))
+	diff = tf.subtract(P, tf.transpose(x))**2
+
+	ss = tf.reduce_sum( tf.multiply(-A, diff ), 1)
+	ss = tf.reshape(ss, [-1,1])
+	exp  = tf.exp(ss)
+
+	y = -tf.matmul(tf.reshape(alpha,[1,-1]), exp)
+
+	if normalize:
+		y = 2*(y-minv)/(maxv-minv)-1
+
+	return tf.reshape(y, (-1,1))
