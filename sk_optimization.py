@@ -24,8 +24,6 @@ class SKOptimizer:
 
             res = opt(lambda x: fun(x,i), [(-1.0, 1.0)]*dim, n_calls=n_steps, x0=x_start)
 
-            res = skopt.gp_minimize(lambda x: fun(x,i), [(-1.0, 1.0)]*dim, n_calls=n_steps, x0=x_start, n_random_starts=n_random_starts)
-
             samples_sk_x += [np.array(res.x_iters)]
             samples_sk_y += [np.array(res.func_vals)]
 
