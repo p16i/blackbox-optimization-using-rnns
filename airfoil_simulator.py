@@ -18,9 +18,9 @@ def simulate(airfoil_file_name, path):
                                         stderr=subprocess.PIPE,
                                         universal_newlines=True)
     out, err = process.communicate(
-            # "plop\n"
-            # "g\n"
-            # " \n"
+             "plop\n"
+             "g\n"
+             " \n"
             "load {}\n"
             "foil{}\n"
             "pane\n"
@@ -66,7 +66,7 @@ def getLDfromLog(airfoil_file_name, path):
 
 
 
-def objective(ys, debug=False):
+def objective(ys, pos1=3, pos2=4, debug=False):
     """
     ys: y-cordinates of the control points
     takes the ys and combine them with xs -> control points~(x,y)
@@ -74,10 +74,10 @@ def objective(ys, debug=False):
     calls simulate function to simulate the airfoil shape and returns the L/D coefficient
     """
     ##### append remaining ys as we are taking only 2 ys out of 6 for now.
-    tmp = [0.05, 0.1, 0.2]
-    tmp.append(ys[0])
-    tmp.append(ys[1])
-    tmp.append(-0.05)
+    tmp = [0.05, 0.1, 0.2, -0.2, -0.1, -0.05]
+    tmp[pos1] = ys[0]
+    tmp[pos2] = ys[1]
+
     ys = np.array(tmp)
     ########################
     #print(ys)
