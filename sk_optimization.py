@@ -21,11 +21,11 @@ class SKOptimizer:
 		"random": skopt.dummy_minimize, "gbrt": skopt.gbrt_minimize}[optimizer]
 		
         for i in range(n):
-<<<<<<< HEAD
+
             res = opt(lambda x: fun(x,i), [(-1.0, 1.0)]*dim, n_calls=n_steps, x0=x_start)
-=======
+
             res = skopt.gp_minimize(lambda x: fun(x,i), [(-1.0, 1.0)]*dim, n_calls=n_steps, x0=x_start, n_random_starts=n_random_starts)
->>>>>>> 02c1ab814a1766a4e193c288cf37ff385b0d3818
+
             samples_sk_x += [np.array(res.x_iters)]
             samples_sk_y += [np.array(res.func_vals)]
 
