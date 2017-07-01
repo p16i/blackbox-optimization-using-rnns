@@ -41,7 +41,6 @@ class SKOptimizer:
 
         X, A, minv, maxv = utils.loadData(dim, 'testing', kernel)
 
-        n_steps = 21
         n_bumps = 6
         l = 2/n_bumps*np.sqrt(dim)
 
