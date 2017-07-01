@@ -34,7 +34,7 @@ class SKOptimizer:
         return np.array(samples_sk_x).reshape(n, n_steps, dim), np.array(samples_sk_y).reshape(n, n_steps)
 
     def run(self, dim, kernel, n_steps=21, no_testing_func=10, optimizer = 'gp'):
-        print("Optimizing for first %d functions of %d-%s testing data using %s optimizer" % (no_testing_func, dim, kernel, optimizer))
+        print("Optimizing for first %d functions of %d-%s testing data using %s optimizer with %d steps" % (no_testing_func, dim, kernel, optimizer, n_steps))
         conf = utils.loadConfig()
 
         x0 = conf['experiments']["%dD" % dim]['hyperparameters']['starting_point'][0]
