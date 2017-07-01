@@ -32,12 +32,12 @@ def prepare_controls(ys): #ys: np.array of ys of the variable points
     #control_points_list.append([1, 0])
     return  control_points_list
 
-def xfoil(control_points_list, airfoil_file_name, path, method, timeout):
+def xfoil(control_points_list, airfoil_file_name, path, method, timeout, alpha):
     """This function will take the control points and pass it to generate_airfoil to generate the cordinates of the
     airfoil, saves it in a file and call xfoill to calculate the L/D coeff. and return it"""
     # TODO: Add type check for arguments: control_pts->list, cp->list
     generate_airfoil(control_points_list, airfoil_file_name, path, method=method)
-    command = xf.Command(airfoil_file_name, path, alfa=5)
+    command = xf.Command(airfoil_file_name, path, alfa=alpha)
     command.run(timeout)
     ldc = command.getLDfromLog()
     #xf.simulate_foil(airfoil_file_name, path)
@@ -118,6 +118,6 @@ if __name__ == "__main__":
     #test xfoil()##############
     ys = [0.05, 0.1, 0.2, -8.2, -0.1, -0.05]
     control_points_list = prepare_controls(ys)
-    ldc = xfoil(control_points_list, '10', results_dir, method= 'bezier', timeout=5)
+    ldc = xfoil(control_points_list, '10', results_dir, method= 'bezier', timeout=5, alpha=5)
     print("Iteration:   " + '10' + '\n' + 'control points: ' + str(control_points_list)
           + '\n' + "L/D = " + str(ldc) + "\n")

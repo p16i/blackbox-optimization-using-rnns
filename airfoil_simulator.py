@@ -5,7 +5,7 @@ import numpy as np
 
 foilnum = 0
 
-def simulate(airfoil_file_name, path):
+def simulate(airfoil_file_name, path, alpha):
     """
     airfoil_file_name: str parameter for name of the airfoil.
     path: str value for the directory of the airfoil_file path
@@ -21,6 +21,7 @@ def simulate(airfoil_file_name, path):
              "plop\n"
              "g\n"
              " \n"
+			 "timeout 5\n"
             "load {}\n"
             "foil{}\n"
             "pane\n"
@@ -66,7 +67,7 @@ def getLDfromLog(airfoil_file_name, path):
 
 
 
-def objective(ys, pos1=3, pos2=4, debug=False):
+def objective(ys, pos1=3, pos2=4, alpha=5, debug=False):
     """
     ys: y-cordinates of the control points
     takes the ys and combine them with xs -> control points~(x,y)
@@ -87,7 +88,7 @@ def objective(ys, pos1=3, pos2=4, debug=False):
     path = r'.test_opt/'
     u.make_sure_path_exists(path)
     u.generate_airfoil(control_points_list, str(foilnum), path, method='bezier')
-    simulate(str(foilnum), path)
+    simulate(str(foilnum), path, alpha=alpha)
     ldc = getLDfromLog(str(foilnum), path)
     if debug:
         print ("Iteration:   " + str(foilnum) + '\n' + 'control points: ' + str(control_points_list)
