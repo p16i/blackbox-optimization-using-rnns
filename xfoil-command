@@ -1,0 +1,16 @@
+load .test_opt/0.dat
+foil something
+pane
+oper
+visc 5e005
+M 0.2
+ITER
+300
+pacc
+something.log
+
+alfa 0.2
+aseq 5 5 1
+
+quit
+

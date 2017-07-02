@@ -6,6 +6,17 @@ MODEL_DIR: ./trained_models
 SPEARMINT_CONF_BASE_DIR: './spearmint-config'
 SKOPT_RESULT_BASE_DIR: './skopt-result'
 
+
+
+airfoil_optimization:
+    output_dir: './airfoil-opt-result'
+    no_alpha: 5
+    alpha_range: [-5,5]
+    x_start : -1
+    lstm_model_2d: 'rnn-cell-2d-1498485717'
+    adjustable_y : [1,2,3,4,5]
+
+
 experiments:
     1D:
         np_training: 2000

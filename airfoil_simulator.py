@@ -2,6 +2,8 @@ import subprocess, threading
 import os
 import utility as u
 import numpy as np
+import os
+import shutil
 
 foilnum = 0
 
@@ -11,19 +13,18 @@ def simulate(airfoil_file_name, path, alpha):
     path: str value for the directory of the airfoil_file path
     This function runs simulate the airfoil and stores the results in the same directory as a .log file
     """
-    #xfoilpath = '/Applications/Xfoil.app/Contents/Resources/xfoil'
-    xfoilpath = 'C:/Users/User/Downloads/XFOIL6.99/xfoil'
+    xfoilpath = os.environ['XFOIL_PATH']
     process = subprocess.Popen(xfoilpath,stdin=subprocess.PIPE,
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE,
                                         universal_newlines=True)
-    out, err = process.communicate(
-             "plop\n"
-             "g\n"
-             " \n"
-			 "timeout 5\n"
-            "load {}\n"
-            "foil{}\n"
+    def target():
+        out, err = process.communicate(
+            "plop\n"
+            "g\n"
+            " \n"
+            "load {foil}\n"
+            "foil{foil_name}\n"
             "pane\n"
             "oper\n"
             "visc 5e005\n"
@@ -31,16 +32,44 @@ def simulate(airfoil_file_name, path, alpha):
             "ITER\n"
             "300\n"
             "pacc\n"
-            "{}\n"
+            "{log}\n"
             " \n"
-            # "alfa 5"
+            "alfa {alpha}\n"
             # "aseq {} {} {}\n"
             "aseq 5 5 1\n"
             # "hard"
             " \n"
-            "quit\n".format(path + airfoil_file_name + '.dat',
-                            airfoil_file_name,
-                            path + airfoil_file_name + '.log'))
+            "quit\n".format(
+                foil = path + airfoil_file_name + '.dat',
+                foil_name = airfoil_file_name,
+                log = path + airfoil_file_name + '.log',
+                alpha = alpha
+            )
+        )
+
+    thread = threading.Thread(target=target)
+    thread.start()
+
+    thread.join(5)
+    if thread.is_alive():
+        #print ('Terminating process')
+        process.terminate()
+        thread.join()
+    try:
+        retutncode = process.returncode
+        if retutncode==-15:
+            print('XFOIL : Not converge')
+        else:
+            print('XFOIL : Converged')
+    except:
+        pass
+            # raise TerminationException(self.path, airfoil_file_name)
+    # except TerminationException as te:
+    #     te.handle()
+    # except AttributeError as e:
+    #     error_log_file = open("./airfoil-failed.log", 'a')
+    #     error_log_file.write(airfoil_file_name +": xfoil not executed" '\n')
+    #     error_log_file.close()
 
 def getLDfromLog(airfoil_file_name, path):
     """
@@ -53,17 +82,19 @@ def getLDfromLog(airfoil_file_name, path):
     filename = path + airfoil_file_name + ".log"
     f = open(filename, 'r')
     flines = f.readlines()
-    LD = dict()
-    for i in range(12, len(flines)):
+    # LD = dict()
+    # for i in range(12, len(flines)):
         # print flines[i]
-        words = str.split(flines[i])
-        alfa = words[0]
-        LD[alfa] = float(words[1]) / float(words[2])
-    #print(LD)
-    if "5.000" in LD.keys():
-            return LD["5.000"]
+    if len(flines) >= 13:
+        words = str.split(flines[12])
+        return float(words[1]) / float(words[2])
     else:
-            return -1
+        return -1
+    # #print(LD)
+    # if "5.000" in LD.keys():
+    #         return LD["5.000"]
+    # else:
+    #         return -1
 
 
 
@@ -93,7 +124,12 @@ def objective(ys, pos1=3, pos2=4, alpha=5, debug=False):
     if debug:
         print ("Iteration:   " + str(foilnum) + '\n' + 'control points: ' + str(control_points_list)
                 + '\n' + "L/D = " + str(ldc) + "\n")
+    else:
+        os.remove('%s%s.log' % (path, foilnum))
+        os.remove('%s%s.dat' % (path, foilnum))
+
     foilnum = foilnum + 1
+
     return ldc
 
 
