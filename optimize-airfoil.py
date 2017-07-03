@@ -7,7 +7,7 @@ import airfoil_simulator
 import skopt
 
 class OptimizeAirfoil:
-    def run(self, optimizer='lstm', dim=2, no_steps=20, loss="MIN", kernel="rbf"):
+    def run(self, optimizer='lstm', dim=2, no_steps=20, loss="MIN", kernel="rbf", normalization=100):
         print('Optimize Airfoil with %s optimizer' % optimizer)
 
         config = utils.loadConfig()['airfoil_optimization']
@@ -50,7 +50,7 @@ class OptimizeAirfoil:
 
                 method = '%s-%s-%s' % (optimizer, loss, kernel)
             else:
-                obj_func = lambda x: self.obj_airfoil_lift_drag(x, param)
+                obj_func = lambda x: self.obj_airfoil_lift_drag(x, param, normalization)
 
                 if optimizer is 'random':
                     print('Optimize Randomly')
@@ -69,10 +69,10 @@ class OptimizeAirfoil:
         np.save( '%s/%s-samples_y' % (output_dir, method), results_y)
 
 
-    def optimize_lstm(self, x_0, model, foil_params, steps):
+    def optimize_lstm(self, x_0, model, foil_params, steps, normalization):
         sess, model_params = lstm_model.load_trained_model(model)
         samples_x, samples_y = lstm_model.generate_sample_sequence(sess, model_params, x_0, steps = steps, \
-            obj_func=lambda x: np.array(self.obj_airfoil_lift_drag(x, foil_params)).reshape(1,-1) \
+            obj_func=lambda x: np.array(self.obj_airfoil_lift_drag(x, foil_params, normalization)).reshape(1,-1) \
         )
 
         samples_y = np.array(samples_y).flatten()
@@ -88,7 +88,7 @@ class OptimizeAirfoil:
         res = skopt.gp_minimize(obj_func, dimensions=[(-1.0,1.0)]*2, n_calls=steps, n_random_starts=10, x0=x_0)
         return res.x_iters, res.func_vals
 
-    def obj_airfoil_lift_drag(self, x, foil_params):
+    def obj_airfoil_lift_drag(self, x, foil_params, normalization=100):
         x = np.array(x)
         obj_value = -1*airfoil_simulator.objective(x.reshape(-1), **foil_params)/100
         return obj_value
