@@ -112,6 +112,32 @@ def hartmann3_tf(x):
     y = 2*(y-minv)/(maxv-minv)-1
 
     return tf.reshape(y, (-1,1))
+	
+def styblinski4(x):
+	minv = -39.166*4
+	maxv = 40.0
+	
+	x = np.array(x)*4
+	
+	y = tf.reduce_sum(x**4-16*x**2+5*x,axis=1)/2
+	
+	y = 2*(y-minv)/(maxv-minv)-1
+	
+	return y
+	
+def styblinski4_tf(x):
+	minv = -39.166*4
+	maxv = 40.0
+	
+	x = x*4
+	
+	y = np.sum(x**4-16*x**2+5*x,axis=1)/2
+	
+	y = 2*(y-minv)/(maxv-minv)-1
+	
+	return tf.reshape(y, (-1,1))
+	
+	
 
 def hartmann6(x, normalize=True):
     x = np.array(x)
