@@ -46,7 +46,7 @@ class OptimizeAirfoil:
             if optimizer is 'lstm':
                 print('Using LTSM')
                 model = utils.get_trained_model(dim=2, kernel=kernel, loss=loss)
-                samples_x, samples_y = self.optimize_lstm(x_0, model, param, no_steps)
+                samples_x, samples_y = self.optimize_lstm(x_0, model, param, no_steps, normalization)
 
                 method = '%s-%s-%s' % (optimizer, loss, kernel)
             else:
@@ -65,8 +65,8 @@ class OptimizeAirfoil:
 
 
         print('Saving result to %s' % (method) )
-        np.save( '%s/%s-samples_x' % (output_dir, method), results_x)
-        np.save( '%s/%s-samples_y' % (output_dir, method), results_y)
+        np.save( '%s/normalize-%d/%s-samples_x' % (output_dir, normalization, method), results_x)
+        np.save( '%s/normalize-%d/%s-samples_y' % (output_dir, normalization, method), results_y)
 
 
     def optimize_lstm(self, x_0, model, foil_params, steps, normalization):
@@ -84,13 +84,12 @@ class OptimizeAirfoil:
         return res.x_iters, res.func_vals
 
     def optimize_skopt(self, x_0, steps, obj_func):
-        print(x_0)
         res = skopt.gp_minimize(obj_func, dimensions=[(-1.0,1.0)]*2, n_calls=steps, n_random_starts=10, x0=x_0)
         return res.x_iters, res.func_vals
 
-    def obj_airfoil_lift_drag(self, x, foil_params, normalization=100):
+    def obj_airfoil_lift_drag(self, x, foil_params, normalization):
         x = np.array(x)
-        obj_value = -1*airfoil_simulator.objective(x.reshape(-1), **foil_params)/100
+        obj_value = -1*airfoil_simulator.objective(x.reshape(-1), **foil_params)/normalization
         return obj_value
 
 
