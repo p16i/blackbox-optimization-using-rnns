@@ -4,9 +4,12 @@ import numpy as np
 import fire
 import utils
 import gpfunctions as gp
+import time
 
 class SKOptimizer:
     def get_samples_sk(self, X,A,minv,maxv, l, dim, n_steps, function, kernel, n, x_start, optimizer):
+        t_start = time.time() 
+	
         # performs skopt optimization for the first n gp-functions specified by the parameters X,A,minv,maxv
 
         # the i-th gp-function
@@ -30,6 +33,11 @@ class SKOptimizer:
 
             samples_sk_x += [np.array(res.x_iters)]
             samples_sk_y += [np.array(res.func_vals)]
+			
+			
+        print("Time: ",time.time()-t_start)
+		
+        #print("shape: ", np.array(samples_sk_y).shape)
 
         return np.array(samples_sk_x).reshape(n, n_steps, dim), np.array(samples_sk_y).reshape(n, n_steps)
 

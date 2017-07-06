@@ -286,6 +286,7 @@ def train(dim, kernel = "rbf", n_steps = 20, learning_rate_init=0.001, learning_
     sess.close()
 
 def get_samples(sess, placeholders, samples_x, samples_y, data, x_start):
+    t_start = time.time()
 
     X, A, minv, maxv = data
     n_train = X.shape[0]
@@ -304,22 +305,24 @@ def get_samples(sess, placeholders, samples_x, samples_y, data, x_start):
     samples_v_x = np.array(samples_v_x).reshape(-1,n, dim).transpose((1,0,2))
     samples_v_y = np.array(samples_v_y).reshape(-1,n).T
 
+    print(time.time()-t_start)
+	
     return samples_v_x, samples_v_y
 
 	
 # deprecated!!! use sk_optimization.get_samples_sk instead!
 def get_random_baseline(X_test, A_test, min_test, max_test, l, kernel, function, n_test,n_steps,dim):
 
-#	random_samples = function("np", X_test, A_test, min_test, max_test, l, kernel,\
-#			 np.random.uniform(low=-1.0,high=1.0,size=[n_test,n_steps,dim]))
+	random_samples = function("np", X_test, A_test, min_test, max_test, l, kernel,\
+			 np.random.uniform(low=-1.0,high=1.0,size=[n_test,n_steps,dim]))
 
-	#samples_sorted = [np.min(random_samples[:,:i],axis=1) for i in range(1,n_steps+1)]
-	#samples_sorted = np.mean(np.array(samples_sorted),axis = 1)
+	samples_sorted = [np.min(random_samples[:,:i],axis=1) for i in range(1,n_steps+1)]
+	samples_sorted = np.mean(np.array(samples_sorted),axis = 1)
 	
-	#baseline = np.mean(np.min(random_samples,axis=1))
+	baseline = np.mean(np.min(random_samples,axis=1))
 
-	print("deprecated!!! use sk_optimization.get_samples_sk instead!")
-	#random_samples
+	#print("deprecated!!! use sk_optimization.get_samples_sk instead!")
+	return random_samples
 	
 def get_benchmark_samples(sess, f, cell, weights, dim, n_hidden, n_steps, x_start, scope="rnn_cell"):
     samples_x, samples_y, x_0 = apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, 1, scope="rnn_cell")
