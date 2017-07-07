@@ -113,23 +113,23 @@ def hartmann3_tf(x):
 
     return tf.reshape(y, (-1,1))
 
-def parabolasin(x):
-	minv = 0
-	maxv = 1.0
+def parabolasin(x, wiggle=2.0):
+	minv = -2.0
+	maxv = 5.0
 	
 	x = np.array(x)
 	
-	y = 0.1*np.sum(x**2, axis=1)+np.abs(np.sum(np.sin(2*x),axis = 1))
+	y = np.sum(x**2)+np.sum(np.sin(wiggle*x))
 	
 	y = 2*(y-minv)/(maxv-minv)-1
 	
 	return y
 	
-def parabolasin_tf(x):
-	minv = 0
-	maxv = 1.0
+def parabolasin_tf(x, wiggle=2.0):
+	minv = -2.0
+	maxv = 5.0
 	
-	y = 0.1*tf.reduce_sum(x**2, axis=1)+tf.abs(tf.reduce_sum(tf.sin(2*x),axis = 1))
+	y = tf.reduce_sum(x**2, axis=1)+tf.reduce_sum(tf.sin(wiggle*x),axis = 1)
 	
 	y = 2*(y-minv)/(maxv-minv)-1
 	
