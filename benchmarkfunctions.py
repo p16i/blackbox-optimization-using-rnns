@@ -141,7 +141,7 @@ def styblinski4(x):
 	
 	x = np.array(x)*4
 	
-	y = np.reduce_sum(x**4-16*x**2+5*x,axis=1)/2
+	y = np.sum(x**4-16*x**2+5*x)/2
 	
 	y = 2*(y-minv)/(maxv-minv)-1
 	
@@ -153,7 +153,7 @@ def styblinski4_tf(x):
 	
 	x = x*4
 	
-	y = tf.sum(x**4-16*x**2+5*x,axis=1)/2
+	y = tf.reduce_sum(x**4-16*x**2+5*x,axis=1)/2
 	
 	y = 2*(y-minv)/(maxv-minv)-1
 	
