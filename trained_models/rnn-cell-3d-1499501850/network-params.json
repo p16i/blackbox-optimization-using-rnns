@@ -1,0 +1,1 @@
+{"learning_rate_final": 0.0001, "epochs": 600, "n_bumps": 6, "scope": "rnn-cell-3d-1499501850", "dim": 3, "learning_rate_init": 0.005, "gp_length": 0.5773502691896257, "n_hidden": 100, "n_steps": 20, "forget_bias": 5.0, "loss_function": "SUM"}

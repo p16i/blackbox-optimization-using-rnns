@@ -1,0 +1,1 @@
+{"n_hidden": 60, "dim": 6, "loss_function": "SUMMIN", "gp_length": 0.8164965809277259, "epochs": 2, "n_steps": 20, "n_bumps": 6, "forget_bias": 5.0, "learning_rate_init": 0.005, "scope": "rnn-cell-6d-1498291333", "learning_rate_final": 0.0001}
