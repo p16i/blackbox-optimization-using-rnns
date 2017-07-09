@@ -5,11 +5,13 @@ import fire
 import utils
 import gpfunctions as gp
 import time
+from scipy.optimize import basinhopping
+
 
 class SKOptimizer:
     def get_samples_sk(self, X,A,minv,maxv, l, dim, n_steps, function, kernel, n, x_start, optimizer):
-        t_start = time.time() 
-	
+        t_start = time.time()
+
         # performs skopt optimization for the first n gp-functions specified by the parameters X,A,minv,maxv
 
         # the i-th gp-function
@@ -24,19 +26,37 @@ class SKOptimizer:
             "gp": skopt.gp_minimize,
             "forest": skopt.forest_minimize,
             "random": skopt.dummy_minimize,
-            "gbrt": skopt.gbrt_minimize
+            "gbrt": skopt.gbrt_minimize,
+            "basinhopping": basinhopping
         }[optimizer]
 
         for i in range(n):
 
-            res = opt(lambda x: fun(x,i), [(-1.0, 1.0)]*dim, n_calls=n_steps, x0=x_start)
+            evalute_gp_func = lambda x: fun(x,i)
 
-            samples_sk_x += [np.array(res.x_iters)]
-            samples_sk_y += [np.array(res.func_vals)]
-			
-			
+            if optimizer in ['gp','forest', 'random', 'gbrt']:
+                res = opt( evalute_gp_func, [(-1.0, 1.0)]*dim, n_calls=n_steps, x0=x_start)
+
+                samples_sk_x += [np.array(res.x_iters)]
+                samples_sk_y += [np.array(res.func_vals)]
+            elif optimizer is 'basinhopping':
+
+                samples_x = [x_start]
+                samples_y = [evalute_gp_func(x_start)]
+
+                def callback_func(x, f_x, accepted):
+                    samples_x.append(x)
+                    samples_y.append(f_x)
+
+                minimizer_kwargs = dict(method='L-BFGS-B', bounds = [(-1,1)]*dim)
+                res = opt( evalute_gp_func, x0=x_start, minimizer_kwargs=minimizer_kwargs, niter=n_steps-1, callback= callback_func )
+
+                samples_sk_x += samples_x
+                samples_sk_y += samples_y
+
+
         print("Time: ",time.time()-t_start)
-		
+
         #print("shape: ", np.array(samples_sk_y).shape)
 
         return np.array(samples_sk_x).reshape(n, n_steps, dim), np.array(samples_sk_y).reshape(n, n_steps)
