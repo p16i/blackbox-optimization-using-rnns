@@ -116,50 +116,52 @@ def hartmann3_tf(x):
 def parabolasin(x, wiggle=2.0):
 	minv = -2.0
 	maxv = 5.0
-	
+
 	x = np.array(x)
-	
+
 	y = np.sum(x**2)+np.sum(np.sin(wiggle*x))
-	
+
 	y = 2*(y-minv)/(maxv-minv)-1
-	
+
 	return y
-	
+
 def parabolasin_tf(x, wiggle=2.0):
 	minv = -2.0
 	maxv = 5.0
-	
+
 	y = tf.reduce_sum(x**2, axis=1)+tf.reduce_sum(tf.sin(wiggle*x),axis = 1)
-	
+
 	y = 2*(y-minv)/(maxv-minv)-1
-	
+
 	return tf.reshape(y, (-1,1))
-	
-def styblinski4(x):
+
+def styblinski4(x, normalize=True):
 	minv = -39.166*4
 	maxv = 40.0
-	
-	x = np.array(x)*4
-	
-	y = np.sum(x**4-16*x**2+5*x)/2
-	
-	y = 2*(y-minv)/(maxv-minv)-1
-	
+
+	x = np.array(x)*5
+
+	y = np.sum(x**4-16*x**2+5*x)/2.0
+
+	if normalize:
+		y = 2*(y-minv)/(maxv-minv)-1
+
 	return y
-	
-def styblinski4_tf(x):
+
+def styblinski4_tf(x, normalize=True):
 	minv = -39.166*4
 	maxv = 40.0
-	
-	x = x*4
-	
+
+	x = x*5
+
 	y = tf.reduce_sum(x**4-16*x**2+5*x,axis=1)/2
-	
-	y = 2*(y-minv)/(maxv-minv)-1
-	
+
+	if normalize:
+		y = 2*(y-minv)/(maxv-minv)-1
+
 	return tf.reshape(y, (-1,1))
-	
-	
+
+
 
 def hartmann6(x, normalize=True):
     x = np.array(x)

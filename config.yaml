@@ -1,12 +1,13 @@
+# LSTM Related
 TIME_HORIZON: 100
 DATA_DIR: ./Data
 BASE_LOG_DIR: ./log
 MODEL_DIR: ./trained_models
 
+# Experiment log
 SPEARMINT_CONF_BASE_DIR: './spearmint-config'
 SKOPT_RESULT_BASE_DIR: './skopt-result'
-
-
+BENCHMARK_RESULT_BASE_DIR: './benchmark-result'
 
 airfoil_optimization:
     output_dir: './airfoil-opt-result'
@@ -26,7 +27,7 @@ experiments:
             learning_rate_init: [0.005]
             learning_rate_final: [0.0001]
             n_hidden: [100]
-            loss_function: ['MIN','OI', 'SUMMIN', 'WSUM_EXPO']
+            loss_function: ['MIN','OI', 'SUM', 'WSUM_EXPO']
             batch_size: [128]
             n_steps: [20]
             gradient_clipping: [1.0]
@@ -42,7 +43,7 @@ experiments:
             learning_rate_init: [0.005]
             learning_rate_final: [0.0001]
             n_hidden: [100]
-            loss_function: ['MIN','OI', 'SUMMIN', 'WSUM_EXPO']
+            loss_function: ['MIN','OI', 'SUM', 'WSUM_EXPO']
             batch_size: [128]
             n_steps: [20]
             gradient_clipping: [1.0]
@@ -58,7 +59,7 @@ experiments:
             learning_rate_init: [0.005]
             learning_rate_final: [0.0001]
             n_hidden: [100]
-            loss_function: ['MIN','OI', 'SUMMIN', 'WSUM_EXPO']
+            loss_function: ['MIN','OI', 'SUM', 'WSUM_EXPO']
             batch_size: [128]
             n_steps: [20]
             gradient_clipping: [1.0]
@@ -74,7 +75,7 @@ experiments:
             learning_rate_init: [0.005]
             learning_rate_final: [0.0001]
             n_hidden: [100]
-            loss_function: ['MIN','OI', 'SUMMIN', 'WSUM_EXPO']
+            loss_function: ['MIN','OI', 'SUM', 'WSUM_EXPO']
             batch_size: [128]
             n_steps: [20]
             gradient_clipping: [1.0]
@@ -90,7 +91,8 @@ experiments:
             learning_rate_init: [0.005]
             learning_rate_final: [0.0001]
             n_hidden: [100]
-            loss_function: ['MIN','OI', 'SUMMIN', 'WSUM_EXPO']
+            loss_function: ['MIN','OI', 'SUM', 'WSUM_EXPO']
+            loss_function: ['SUM']
             batch_size: [128]
             n_steps: [20]
             gradient_clipping: [1.0]
