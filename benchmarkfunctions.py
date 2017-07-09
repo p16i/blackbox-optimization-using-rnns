@@ -151,15 +151,6 @@ def styblinski4(x, normalize=True):
 def styblinski4_tf(x, normalize=True):
 	minv = -39.166*4
 	maxv = 40.0
-<<<<<<< 16ced9ca3bac16ac5f276585094e8233874cefc1
-
-	x = x*4
-
-	y = tf.reduce_sum(x**4-16*x**2+5*x,axis=1)/2
-
-	y = 2*(y-minv)/(maxv-minv)-1
-
-=======
 
 	x = x*5
 
@@ -168,7 +159,6 @@ def styblinski4_tf(x, normalize=True):
 	if normalize:
 		y = 2*(y-minv)/(maxv-minv)-1
 
->>>>>>> update functions
 	return tf.reshape(y, (-1,1))
 
 
