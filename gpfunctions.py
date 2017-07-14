@@ -85,6 +85,34 @@ def benchmark_prior3(np_or_tf,X,A,minv,maxv,l,kernel,x):
 
 	else: 
 		return normalize(minv,maxv,(GP(np_or_tf, X,A,x*tf.cos(3*x),l,rbf_kernel)))
+		
+def benchmark_prior4(np_or_tf,X,A,minv,maxv,l,kernel,x): 
+	
+	if np_or_tf == "np": 
+		return np.round(normalize(minv,maxv,(GP(np_or_tf, X,A,np.round(10*x)/10,l,rbf_kernel)))*10)/10
+
+	else: 
+		return tf.round(normalize(minv,maxv,(GP(np_or_tf, X,A,tf.round(10*x)/10,l,rbf_kernel)))*10)/10
+		
+def benchmark_prior5(np_or_tf,X,A,minv,maxv,l,kernel,x): 
+	tile = lambda x : (x+np.floor(x)+0.5)/1.5 
+	
+	
+	if np_or_tf == "np": 
+		return normalize(minv,maxv,(GP(np_or_tf, X,A,((8*x-np.floor(8*x))-0.5)/2+np.floor(8*x)/8,l,kernel)))
+
+	else: 
+		return normalize(minv,maxv,(GP(np_or_tf, X,A,((8*x-tf.floor(8*x))-0.5)/2+tf.floor(8*x)/8,l,kernel)))
+		
+def benchmark_prior6(np_or_tf,X,A,minv,maxv,l,kernel,x): 
+	tile = lambda x : (x+np.floor(x)+0.5)/1.5 
+	
+	
+	if np_or_tf == "np": 
+		return normalize(minv,maxv,(GP(np_or_tf, X,A,0.5*np.abs(x)+((4*x-np.floor(4*x))-0.5)/2+np.floor(4*x)/4-0.5,l,matern32_kernel)))
+
+	else: 
+		return normalize(minv,maxv,(GP(np_or_tf, X,A,0.5*tf.abs(x)+((4*x-tf.floor(4*x))-0.5)/2+tf.floor(4*x)/4-0.5,l,matern32_kernel)))
 
 def kernel_function(kernel):
     kernel_func = None
