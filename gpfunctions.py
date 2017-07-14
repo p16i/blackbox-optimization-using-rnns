@@ -54,6 +54,37 @@ def airfoil_prior(np_or_tf, X,A,minv,maxv,l,kernel,x):
 		minv = tf.tanh(1.5*minv+0.3)
 		maxv = tf.tanh(1.5*maxv+0.3)
 		return  normalize(minv,maxv,tf.tanh(1.5*(GP(np_or_tf, X,A,x,l,kernel))+0.3))
+		
+def benchmark_prior1(np_or_tf,X,A,minv,maxv,l,kernel,x): 
+	
+	if np_or_tf == "np": 
+		return 2.0*(np.maximum(0.0,normalize(minv,maxv,(GP(np_or_tf, X,A,x,l,rbf_kernel)))) \
+				+np.minimum(0.0,-normalize(minv,maxv,(GP(np_or_tf, X,A,x,l,matern32_kernel)))) \
+				+np.maximum(0.0,-normalize(minv,maxv,(GP(np_or_tf, X,A,x,l,rbf_kernel)))) \
+				+np.minimum(0.0,normalize(minv,maxv,(GP(np_or_tf, X,A,x,l,matern32_kernel))))) 
+	else: 
+		return  2.0*(tf.maximum(0.0,normalize(minv,maxv,(GP(np_or_tf, X,A,x,l,rbf_kernel)))) \
+				+ tf.minimum(0.0,-normalize(minv,maxv,(GP(np_or_tf, X,A,x,l,matern32_kernel)))) \
+				+ tf.maximum(0.0,-normalize(minv,maxv,(GP(np_or_tf, X,A,x,l,rbf_kernel)))) \
+				+ tf.minimum(0.0,normalize(minv,maxv,(GP(np_or_tf, X,A,x,l,matern32_kernel)))))
+				
+def benchmark_prior2(np_or_tf,X,A,minv,maxv,l,kernel,x): 
+	
+	if np_or_tf == "np": 
+		return np.maximum(0.0,normalize(minv,maxv,(GP(np_or_tf, X,A,x,l-0.1,rbf_kernel)))) \
+				+np.minimum(0.0,-normalize(minv,maxv,(GP(np_or_tf, X,A,x,l+0.1,matern32_kernel)))) 
+
+	else: 
+		return  tf.maximum(0.0,normalize(minv,maxv,(GP(np_or_tf, X,A,x,l-0.1,rbf_kernel)))) \
+				+ tf.minimum(0.0,-normalize(minv,maxv,(GP(np_or_tf, X,A,x,l+0.1,matern32_kernel)))) 
+				
+def benchmark_prior3(np_or_tf,X,A,minv,maxv,l,kernel,x): 
+	
+	if np_or_tf == "np": 
+		return normalize(minv,maxv,(GP(np_or_tf, X,A,x*np.cos(3*x),l,rbf_kernel)))
+
+	else: 
+		return normalize(minv,maxv,(GP(np_or_tf, X,A,x*tf.cos(3*x),l,rbf_kernel)))
 
 def kernel_function(kernel):
     kernel_func = None
