@@ -42,7 +42,8 @@ def min_up_to_k(data):
     return mins_up_to_k
 
 def average_min_found_values_across_rows(values):
-    return np.mean(np.apply_along_axis(min_up_to_k, 1, values), axis=0)
+    min_k = np.apply_along_axis(min_up_to_k, 1, values)
+    return np.mean( min_k, axis=0), np.std(min_k, axis=0)
 
 def string_to_number(st):
     stt = re.sub('^-','',st)
