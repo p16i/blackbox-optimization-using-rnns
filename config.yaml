@@ -11,11 +11,16 @@ BENCHMARK_RESULT_BASE_DIR: './benchmark-result'
 
 airfoil_optimization:
     output_dir: './airfoil-opt-result'
-    no_alpha: 5
+    no_alpha: 50
     alpha_range: [-5,5]
     x_start : -1
     lstm_model_2d: 'rnn-cell-2d-1498485717'
     adjustable_y : [1,2,3,4,5]
+
+    y_input_space:
+        3: [-0.5,0.2]
+        4: [-0.2,0.08]
+        5: [-0.1,0.04]
 
 
 experiments:

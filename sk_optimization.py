@@ -61,8 +61,9 @@ class SKOptimizer:
 
         return np.array(samples_sk_x).reshape(n, n_steps, dim), np.array(samples_sk_y).reshape(n, n_steps)
 
-    def run(self, dim, kernel, n_steps=21, no_testing_func=10, optimizer = 'gp'):
+    def run(self, dim, kernel, n_steps=21, no_testing_func=10, optimizer = 'gp', dataset='normal'):
         print("Optimizing for first %d functions of %d-%s testing data using %s optimizer with %d steps" % (no_testing_func, dim, kernel, optimizer, n_steps))
+        print('dataset %s' % dataset)
         conf = utils.loadConfig()
 
         x0 = conf['experiments']["%dD" % dim]['hyperparameters']['starting_point'][0]
@@ -72,11 +73,17 @@ class SKOptimizer:
         n_bumps = 6
         l = 2/n_bumps*np.sqrt(dim)
 
+        dataset_func = gp.dataset_function(dataset)
+        print(dataset_func)
         kernel_func = gp.kernel_function(kernel)
 
-        samples_x, samples_y = self.get_samples_sk(X, A, minv, maxv, l, dim, n_steps, gp.normalized_gp_function, kernel_func, no_testing_func, x0, optimizer = optimizer)
+        samples_x, samples_y = self.get_samples_sk(X, A, minv, maxv, l, dim, n_steps, dataset_func, kernel_func, no_testing_func, x0, optimizer = optimizer)
 
-        directory = '%s/%sd-%s' % ( optimizer, dim, kernel )
+        base = kernel
+        if dataset != 'normal':
+            base = '%s-%s'% (kernel, dataset)
+
+        directory = '%s/%sd-%s' % ( optimizer, dim, base )
 
         print('Saving data with prefix %s' % directory )
         self.save_samples(samples_x, samples_y, directory)
