@@ -55,6 +55,12 @@ def airfoil_prior(np_or_tf, X,A,minv,maxv,l,kernel,x):
 		maxv = tf.tanh(1.5*maxv+0.3)
 		return  normalize(minv,maxv,tf.tanh(1.5*(GP(np_or_tf, X,A,x,l,kernel))+0.3))
 
+def benchmark_prior0(np_or_tf,X,A,minv,maxv,l,kernel,x):
+	if np_or_tf == "np":
+		return np.minimum(np.sum((x-X[:,0,:][:,np.newaxis,:])**2, axis = (2))-1,1)
+	else:
+		return  tf.expand_dims(tf.minimum(tf.reduce_sum((x-X[:,0,:])**2, axis = 1)-1,1),1)
+		
 def benchmark_prior1(np_or_tf,X,A,minv,maxv,l,kernel,x):
 
     coeff = 8.0

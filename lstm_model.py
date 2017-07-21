@@ -63,9 +63,11 @@ def build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l, kernel
     f = lambda x: function("tf", Xt, At, mint, maxt, l, kernel, x)
 
     cell, weights = get_lstm_weights(n_hidden, forget_bias, dim, scope=scope)
-
+	
     samples_x, samples_y, x_0 = apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, tf.shape(Xt)[0], scope=scope)
 
+    
+	
     return Xt, At, mint, maxt, samples_x, samples_y, x_0, cell, weights
 
 def get_loss(samples_y, loss_type, samples_x=None):
