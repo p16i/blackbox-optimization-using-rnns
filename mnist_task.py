@@ -13,12 +13,21 @@ from scipy.optimize import basinhopping
 from sklearn.cross_validation import StratifiedKFold
 
 # http://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
-GAMMA_MIN = 2**(-15)
-GAMMA_MAX = 2**(2)
-C_MIN     = 2**(-5)
-C_MAX     = 2**(4)
+# GAMMA_MIN = 2**(-15)
+# GAMMA_MAX = 2**(2)
+# C_MIN     = 2**(-5)
+# C_MAX     = 2**(4)
+# GAMMA_MIN = 2**(-15)
+# GAMMA_MAX = 2**(2)
+# C_MIN     = 2**(-5)
+# C_MAX     = 2**(10)
+GAMMA_MIN = -10
+GAMMA_MAX = 4
+C_MIN     = -5
+C_MAX     = 10
 
 DIMENSIONS = [(GAMMA_MIN, GAMMA_MAX), (C_MIN, C_MAX)]
+# DIMENSIONS = [(2**GAMMA_MIN, 2**GAMMA_MAX), (2**C_MIN, 2**C_MAX)]
 
 class MNISTTask:
 
@@ -35,8 +44,8 @@ class MNISTTask:
         # y_train, y_test = target[indices[:, 0]], target[indices[:, 1][:no_test_data]]
         # indices = np.random.choice( int(mnist.data.shape[0]), (no_data, 2), replace=False)
 
+        print('gamma=%f , C=%f, seed=%d' % (gamma, C, seed))
 
-        seed = 4367
         data, _, target, _ = train_test_split(mnist.data, mnist.target, test_size=0.96, random_state=seed)
 
         acc_basket = []
@@ -120,10 +129,11 @@ class MNISTTask:
                 samples_x = np.array(samples_x).flatten().reshape(-1,2)
                 samples_x = self.scaler.inverse_transform(samples_x)
 
+                samples_x = np.power(2, samples_x)
                 samples_y = (samples_y-1)/2
                 method = '%s-%s-%s' % (optimizer, loss, kernel)
             else:
-                x0 = np.array([GAMMA_MIN,C_MIN])
+                x0 = np.array([DIMENSIONS[0][0], DIMENSIONS[1][0]], dtype=np.float)
                 obj_func = lambda x: self.objective_function(x, s)
                 if optimizer is 'random':
                     print('Optimize Randomly')
@@ -134,9 +144,6 @@ class MNISTTask:
                     samples_x, samples_y = self.optimize_basinhopping(x0, no_steps+1, obj_func)
 
                 samples_x = np.array(samples_x).flatten().reshape(-1,2)
-                # samples_x = self.scaler.inverse_transform(samples_x)
-
-
 
 
             results_x[i,:,:] = np.array(samples_x).reshape(1,-1,2)
@@ -148,10 +155,10 @@ class MNISTTask:
     def objective_function(self, x, seed, scaling=False):
         if scaling:
             x = self.scaler.inverse_transform(x)[0]
+        x = np.power(2.0, x)
 
-        print(x)
         acc = self.train_and_evaluate(x[0], x[1], seed)
-        print('  > %f' % acc)
+        print('acc  > %f' % acc)
 
         if scaling:
             acc = -2*acc + 1
