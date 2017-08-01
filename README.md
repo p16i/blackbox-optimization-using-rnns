@@ -11,5 +11,5 @@ Full report and poster can be found at `./report`.
 - Raphael Holca-Lammare(Supervisor)
 
 
-## Development
-Please check `DEVELOPMENT.md` to set up development environment.
+## Development Setup
+Please check `DEVELOPMENT.md`.
