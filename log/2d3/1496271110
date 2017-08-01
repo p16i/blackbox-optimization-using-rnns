@@ -1,0 +1,13 @@
+------------------------------------------------------------------------------------
+Function Dimension            : 2
+RNN Scope                     : rnn-cell-1496271110
+Number of Training Samples    : 20000
+Number of Test Samples        : 2000
+Loss                          : MIN
+Batch size                    : 160
+Number of hidden Units        : 30
+Sequence length               : 10
+Epochs                        : 1
+Learning rate                 : 0.00100
+------------------------------------------------------------------------------------
+Ep:    0 | TrainLoss : -0.639 | TrainMin: -0.639 | TestLoss: -0.645 | TestMin: -0.645
