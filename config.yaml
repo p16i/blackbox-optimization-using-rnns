@@ -5,13 +5,12 @@ BASE_LOG_DIR: ./log
 MODEL_DIR: ./trained_models
 
 # Experiment log
-SPEARMINT_CONF_BASE_DIR: './spearmint-config'
-SKOPT_RESULT_BASE_DIR: './skopt-result'
-MNIST_RESULT_BASE_DIR: './mnist-result'
-BENCHMARK_RESULT_BASE_DIR: './benchmark-result'
+SKOPT_RESULT_BASE_DIR: './results/skopt'
+MNIST_RESULT_BASE_DIR: './results/mnist'
+BENCHMARK_RESULT_BASE_DIR: './results/benchmark-functions'
 
 airfoil_optimization:
-    output_dir: './airfoil-opt-result'
+    output_dir: './results/airfoil'
     no_alpha: 10
     alpha_range: [-5,5]
     x_start : -1
