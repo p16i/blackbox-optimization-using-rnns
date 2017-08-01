@@ -204,7 +204,7 @@ def train(dim, kernel = "rbf", n_steps = 20, learning_rate_init=0.001, learning_
         kernel_func = gp.matern52_kernel
 
     Xt, At, mint, maxt, samples_x, samples_y, x_0, cell, weights = \
-        build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l, kernel=kernel_func, function=gp.normalized_gp_function, scope=scope)
+        build_training_graph(n_bumps, dim, n_hidden, forget_bias, n_steps, l, kernel=kernel_func, scope=scope)
 
     loss = get_loss(samples_y, loss_function)
 
@@ -308,10 +308,10 @@ def get_samples(sess, placeholders, samples_x, samples_y, data, x_start):
     samples_v_y = np.array(samples_v_y).reshape(-1,n).T
 
     print(time.time()-t_start)
-	
+
     return samples_v_x, samples_v_y
 
-	
+
 # deprecated!!! use sk_optimization.get_samples_sk instead!
 def get_random_baseline(X_test, A_test, min_test, max_test, l, kernel, function, n_test,n_steps,dim):
 
@@ -320,12 +320,12 @@ def get_random_baseline(X_test, A_test, min_test, max_test, l, kernel, function,
 
 	samples_sorted = [np.min(random_samples[:,:i],axis=1) for i in range(1,n_steps+1)]
 	samples_sorted = np.mean(np.array(samples_sorted),axis = 1)
-	
+
 	baseline = np.mean(np.min(random_samples,axis=1))
 
 	#print("deprecated!!! use sk_optimization.get_samples_sk instead!")
 	return random_samples
-	
+
 def get_benchmark_samples(sess, f, cell, weights, dim, n_hidden, n_steps, x_start, scope="rnn_cell"):
     samples_x, samples_y, x_0 = apply_lstm_model(f, cell, weights, n_steps, dim, n_hidden, 1, scope="rnn_cell")
 
@@ -393,7 +393,6 @@ def generate_sample_sequence(sess, model_params, x0, steps, obj_func):
     samples_y = [y0]
 
     for i in range(steps):
-        print(i)
         x, state = next_sample_point(x,y,state, model_params['_cell'], model_params['_weights'], scope=model_params['scope'])
         x_np = sess.run(x)
         y_np = obj_func(x_np)

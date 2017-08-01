@@ -7,20 +7,24 @@ MODEL_DIR: ./trained_models
 # Experiment log
 SPEARMINT_CONF_BASE_DIR: './spearmint-config'
 SKOPT_RESULT_BASE_DIR: './skopt-result'
+MNIST_RESULT_BASE_DIR: './mnist-result'
 BENCHMARK_RESULT_BASE_DIR: './benchmark-result'
 
 airfoil_optimization:
     output_dir: './airfoil-opt-result'
-    no_alpha: 50
+    no_alpha: 10
     alpha_range: [-5,5]
     x_start : -1
     lstm_model_2d: 'rnn-cell-2d-1498485717'
     adjustable_y : [1,2,3,4,5]
 
     y_input_space:
-        3: [-0.5,0.2]
-        4: [-0.2,0.08]
-        5: [-0.1,0.04]
+        0: [-0.2,0.2]
+        1: [-0.2,0.2]
+        2: [-0.2,0.2]
+        3: [-0.2,0.2]
+        4: [-0.2,0.2]
+        5: [-0.2,0.2]
 
 
 experiments:
@@ -48,7 +52,7 @@ experiments:
             learning_rate_init: [0.005]
             learning_rate_final: [0.0001]
             n_hidden: [100]
-            loss_function: ['MIN','OI', 'SUM', 'WSUM_EXPO']
+            loss_function: ['MIN']
             batch_size: [128]
             n_steps: [20]
             gradient_clipping: [1.0]
@@ -80,7 +84,7 @@ experiments:
             learning_rate_init: [0.005]
             learning_rate_final: [0.0001]
             n_hidden: [100]
-            loss_function: ['MIN','OI', 'SUM', 'WSUM_EXPO']
+            loss_function: ['MIN']
             batch_size: [128]
             n_steps: [20]
             gradient_clipping: [1.0]
@@ -96,8 +100,7 @@ experiments:
             learning_rate_init: [0.005]
             learning_rate_final: [0.0001]
             n_hidden: [100]
-            loss_function: ['MIN','OI', 'SUM', 'WSUM_EXPO']
-            loss_function: ['SUM']
+            loss_function: ['MIN']
             batch_size: [128]
             n_steps: [20]
             gradient_clipping: [1.0]

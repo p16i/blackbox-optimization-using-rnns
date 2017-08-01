@@ -132,6 +132,39 @@ def objective(ys, pos1=3, pos2=4, alpha=5, debug=False):
 
     return ldc
 
+def objective6d(ys, alpha=5, debug=False):
+    """
+    ys: y-cordinates of the control points
+    takes the ys and combine them with xs -> control points~(x,y)
+    pass the (x,y) to bizer to create airfoil shape -> writes it in .dat file
+    calls simulate function to simulate the airfoil shape and returns the L/D coefficient
+    """
+    ##### append remaining ys as we are taking only 2 ys out of 6 for now.
+    tmp = [0.05, 0.1, 0.2, -0.2, -0.1, -0.05]
+    tmp = list(np.array(tmp)+np.array(ys))
+
+    ys = np.array(tmp)
+    ########################
+    #print(ys)
+    ##############################
+    global foilnum
+    control_points_list = u.prepare_controls(ys)
+    path = r'.test_opt/'
+    u.make_sure_path_exists(path)
+    u.generate_airfoil(control_points_list, str(foilnum), path, method='bezier')
+    simulate(str(foilnum), path, alpha=alpha)
+    ldc = getLDfromLog(str(foilnum), path)
+    if debug:
+        print ("Iteration:   " + str(foilnum) + '\n' + 'control points: ' + str(control_points_list)
+                + '\n' + "L/D = " + str(ldc) + "\n")
+    else:
+        os.remove('%s%s.log' % (path, foilnum))
+        os.remove('%s%s.dat' % (path, foilnum))
+
+    foilnum = foilnum + 1
+
+    return ldc
+
 
 if __name__ == '__main__':
     y0 =  np.array([-0.1,  -0.1]) # only 2 ys for now.

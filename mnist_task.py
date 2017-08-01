@@ -192,7 +192,7 @@ class MNISTTask:
             samples_y.append(f_x)
 
         minimizer_kwargs = dict(method='L-BFGS-B', bounds = DIMENSIONS, options=dict(disp=False, maxiter=1))
-        basinhopping( obj_func, x0=x0, minimizer_kwargs=minimizer_kwargs, niter=steps-1, callback= callback_func )
+        basinhopping( obj_func, x0=x0, minimizer_kwargs=minimizer_kwargs, niter=steps-1, callback= callback_func, stepsize=1.5 )
 
         return samples_x, samples_y
 

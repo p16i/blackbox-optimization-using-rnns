@@ -17,10 +17,8 @@ class OptimizeAirfoil:
 
         alphas = np.linspace( config['alpha_range'][0], config['alpha_range'][1], config['no_alpha'] )
 
-        # y_pairs = list(self.generate_pairs(config['adjustable_y']))
         y_pairs = [
-            (3,4),
-            (4,5)
+            (0,1,2,3,4,5)
         ]
 
         print('Generate foils with %d alphas' % len(alphas))
@@ -31,7 +29,6 @@ class OptimizeAirfoil:
 
 
         total_combination = len(param_grid)
-        # total_combination = 1
         print('We have %d foils to run.' %  total_combination)
 
 
@@ -41,14 +38,11 @@ class OptimizeAirfoil:
         method = optimizer
         for i in range(total_combination):
             param = param_grid[i]
-            param['pos1'] = param['y_pair'][0]
-            param['pos2'] = param['y_pair'][1]
-            del param['y_pair']
 
-            input_space = [
-                config['y_input_space'][param['pos1']],
-                config['y_input_space'][param['pos2']]
-            ]
+            input_space = [ config['y_input_space'][i] for i in param['y_pair'] ]
+
+            print(param)
+            del param['y_pair']
 
             print(input_space)
 
@@ -58,7 +52,7 @@ class OptimizeAirfoil:
             if optimizer is 'lstm':
                 x_0 = np.array([ config['x_start'] ]*dim).reshape(-1,dim)
                 print('Using LTSM')
-                model = utils.get_trained_model(dim=2, kernel=kernel, loss=loss)
+                model = utils.get_trained_model(dim=dim, kernel=kernel, loss=loss)
                 samples_x, samples_y = self.optimize_lstm(x_0, model, param, no_steps, normalization, input_space)
 
                 method = '%s-%s-%s' % (optimizer, loss, kernel)
@@ -85,8 +79,8 @@ class OptimizeAirfoil:
 
 
         print('Saving result to %s' % (method) )
-        np.save( '%s/normalize-%d/%s-samples_x' % (output_dir, normalization, method), results_x)
-        np.save( '%s/normalize-%d/%s-samples_y' % (output_dir, normalization, method), results_y)
+        np.save( '%s/normalize-%d/%dd-%s-samples_x' % (output_dir, normalization, dim, method), results_x)
+        np.save( '%s/normalize-%d/%dd-%s-samples_y' % (output_dir, normalization, dim, method), results_y)
 
 
     def optimize_lstm(self, x_0, model, foil_params, steps, normalization, input_space):
@@ -121,13 +115,14 @@ class OptimizeAirfoil:
             samples_y.append(f_x)
 
         minimizer_kwargs = dict(method='L-BFGS-B', bounds = input_space, options=dict(disp=False, maxiter=1))
-        basinhopping( obj_func, x0=x_0, minimizer_kwargs=minimizer_kwargs, niter=steps-1, callback= callback_func )
+        basinhopping( obj_func, x0=x_0, minimizer_kwargs=minimizer_kwargs, niter=steps-1, callback= callback_func,  stepsize=0.8 )
 
         return samples_x, samples_y
 
     def obj_airfoil_lift_drag(self, x, foil_params, normalization):
-        x = np.array(x) / 5.0
-        obj_value = -1*airfoil_simulator.objective(x.reshape(-1), **foil_params)/normalization
+        x = np.array(x)
+        obj_value = -1*airfoil_simulator.objective6d(x.reshape(-1), **foil_params)/normalization
+        print(obj_value)
         return obj_value
 
     def input_scaling(self, x, original_spaces, new_spaces):
