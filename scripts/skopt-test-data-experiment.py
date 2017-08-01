@@ -74,7 +74,6 @@ class SKOptimizer:
         l = 2/n_bumps*np.sqrt(dim)
 
         dataset_func = gp.dataset_function(dataset)
-        print(dataset_func)
         kernel_func = gp.kernel_function(kernel)
 
         samples_x, samples_y = self.get_samples_sk(X, A, minv, maxv, l, dim, n_steps, dataset_func, kernel_func, no_testing_func, x0, optimizer = optimizer)

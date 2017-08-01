@@ -5,7 +5,7 @@ BASE_LOG_DIR: ./training-log
 MODEL_DIR: ./trained_models
 
 # Experiment log
-SKOPT_RESULT_BASE_DIR: './results/skopt'
+SKOPT_RESULT_BASE_DIR: './results/skopt-test-data'
 MNIST_RESULT_BASE_DIR: './results/mnist'
 BENCHMARK_RESULT_BASE_DIR: './results/benchmark-functions'
 
