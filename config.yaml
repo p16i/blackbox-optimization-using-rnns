@@ -1,7 +1,7 @@
 # LSTM Related
 TIME_HORIZON: 100
 DATA_DIR: ./Data
-BASE_LOG_DIR: ./log
+BASE_LOG_DIR: ./trained-log
 MODEL_DIR: ./trained_models
 
 # Experiment log
