@@ -1,20 +1,13 @@
 ## Setup project
 
-### Requirement
+### Requirements
     - TensorFlow
-    - Install all dependencies by running `pip install requirements.txt`
-    - Access to TUB network (VPN)
+    - XFoil
 
-1. SSH to the server. For Windows, you can do this using Putty.
-
-```
-ssh username@server-ip
-```
-
-2. Clone the repository and activate `virtual-env` there.
+1. Clone the repository and activate `virtual-env` there.
 
 ```
-git clone git@github.com:heytitle/neural-network-project.git
+git clone git@github.com:heytitle/blackbox-optimization-using-rnns.git
 
 ```
 
