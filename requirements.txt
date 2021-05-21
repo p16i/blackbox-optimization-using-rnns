@@ -67,7 +67,7 @@ six==1.10.0
 sklearn==0.0
 smart-open==1.5.3
 spacy==1.8.2
-tensorflow==1.1.0
+tensorflow==2.5.0
 termcolor==1.1.0
 terminado==0.6
 testpath==0.3
